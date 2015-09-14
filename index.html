@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>preload</title>
+
+	<style>
+		.a{
+			background: url("./src/image/b4.jpg");
+			width: 640px;
+			height: 1010px;
+		}
+		.b{
+			background: url("./b1.jpg");
+			width: 640px;
+			height: 1010px;
+		}
+	</style>
+</head>
+<body>
+
+	<p id="pro"></p>
+	
+	<div class="a"></div>
+
+
+
+
+	<script src="./dist/js/preload.js"></script>
+
+	<script>
+
+	/**
+	*	Preload 资源预加载组件
+	*	@class Preload
+	*	@param {object}	sources		必填	加载队列容器，支持队列加载以及加载一个队列后传入回调
+	*	@param {string}	wrap		必填	进度条容器，返回记载进度信息
+	*
+	*
+	**/
+
+		var preload = new Preload({
+			sources: {
+				imgs:{
+					source:[
+						"./src/image/b2.jpg",
+						"./src/image/b1.jpg"
+					],
+					callback: function(){
+						//alert(1);
+					}
+				},
+				audio:{
+					source:[
+						"./src/audio/a.mp3",
+						"./src/audio/b.mp3"
+					],
+					callback: function() {
+
+					}
+				},
+				imgs2:{
+					source:[
+						"./src/image/b3.jpg",
+						"./src/image/b4.jpg",
+						"http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
+						"http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
+					],
+					callback: function(){
+						//alert(2);
+					}
+				}
+			},
+			wrap: 'pro'
+		});
+
+		//console.log(preload.getProgress());
+	</script>
+
+	<!-- <img src="./b1.jpg" alt="">
+	<img src="./b2.jpg" alt="">
+	<img src="./b3.jpg" alt="">
+	<img src="./b4.jpg" alt="">
+
+	<audio src="./a.mp3" controls="controls">
+	</audio> -->
+</body>
+</html>
