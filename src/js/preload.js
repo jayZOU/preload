@@ -66,7 +66,6 @@ var Preload = function(opts) {
 	};
 
 	var init = function() {
-		console.log(2);
 		_initData(); //初始化资源参数
 
 		_load(echelon[0], echeloncb[0], echelonlen);
