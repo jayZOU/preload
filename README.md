@@ -10,7 +10,7 @@
     npm install
     gulp
     
-访问http://localhost:8080/
+访问[http://localhost:8080/][1]
 ##Examples
 ```js
     /**
@@ -63,3 +63,9 @@
  - 队列名称不能重名，否则后面的队列会覆盖前面
  - 传入队列一定需要回调，回调内容可以为空
  - 必须传入进度条容器
+
+	
+	
+
+
+  [1]: http://localhost:8080/
