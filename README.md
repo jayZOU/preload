@@ -17,10 +17,10 @@
 	*	Preload 资源预加载组件
 	*	@author jayzou
 	*	@time 2015-9-15
-	*	@version 0.0.2
+	*	@version 0.0.3
 	*	@class Preload
 	*	@param {object}	sources		必填	加载队列容器，支持队列加载以及加载一个队列后传入回调
-	*	@param {string}	wrap		必填	进度条容器，返回记载进度信息
+	*	@param {object}	wrap		必填	进度条容器，返回记载进度信息
 	**/
 
     var preload = new Preload({
@@ -55,14 +55,16 @@
 				}
 			}
 		},
-		wrap: 'pro'         //进度条容器
+		progress: function(completedCount, total){
+			console.log(Math.floor((completedCount / total) * 100));
+		}
 	});
 ```
 ##Notes
 
  - 队列名称不能重名，否则后面的队列会覆盖前面
  - 传入队列一定需要回调，回调内容可以为空
- - 必须传入进度条容器
+ - 必须传入进度条回调
 
 	
 	

@@ -1,6 +1,6 @@
 {
   "name": "preload",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A preload component",
   "author": "jay",
   "dependencies": {

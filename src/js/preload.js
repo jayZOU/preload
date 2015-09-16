@@ -22,7 +22,7 @@
 *				"./b.mp3"
 *			],
 *			callback: function() {
-*
+*				//alert(2);
 *			}
 *		},
 *		imgs2: {
@@ -33,11 +33,13 @@
 *				"http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
 *			],
 *			callback: function() {
-*				//alert(2);
+*				//alert(3);
 *			}
 *		}
 *	},
-*	wrap: 'pro'
+*	wrap: function(completedCount, total){
+*		console.log(Math.floor((completedCount / total) * 100));
+*	}
 *});
 *
 **/
@@ -46,8 +48,8 @@ var Preload = function(opts) {
 	"use strict";
 
 	var sources = opts.sources || null, 		
-		progress = opts.progress || null,				//进度条回调函数
-		completedCount  = 0,							//已加载的资源数
+		progress = opts.progress || null,				//进度条回调
+		completedCount = 0,								//已加载资源总数
 		total = 0,										//资源总数
 		config,											//请求参数
 		id = 0,											//自增ID
@@ -56,7 +58,7 @@ var Preload = function(opts) {
 		echeloncb = [],									//梯队加载后的回调
 		echetotal,										//梯队总数
 		echelonlen = [],								//梯队长度
-		allowType = ['jpg', 'png', 'gif'];				//允许加载的图片类型
+		allowType = ['jpg', 'png', 'gif'],				//允许加载的图片类型
 
 	config = {
 		xhr: null,
@@ -99,8 +101,6 @@ var Preload = function(opts) {
 	var _initData = function() {
 		if(sources === null) return; 
 
-		config.xhr = _createXHR();
-		
 		//梯队总数
 		echetotal = Object.getOwnPropertyNames(sources).length;
 
@@ -123,8 +123,6 @@ var Preload = function(opts) {
 		//资源总数
 		total = echelon.length;
 
-		//获取进度条容器
-		if(wrap !== null) wrap = document.getElementById(wrap);
 	};
 
 	//递归加载单个梯队的资源
@@ -143,27 +141,28 @@ var Preload = function(opts) {
 
 			//加载成功后执行
 			img.onload = function () {
-				getProgress();
+				progress(++completedCount, total);
 				_load(echelon[++id], callback, length);
 			}
 
 			//加载失败后执行
 			img.onerror = function() {
-				getProgress();
+				progress(++completedCount, total);
 				_load(echelon[++id], callback, length);
 			}
 		}else{
 
+			config.xhr = _createXHR();
 			
 			config.xhr.onreadystatechange = function() {
 				if (config.xhr.readyState == 4){
 					if((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304){
 
-						getProgress();
+						progress(++completedCount, total);
 						_load(echelon[++id], callback, length);
 					}
 				}else if(config.xhr.status >= 400 && config.xhr.status < 500){
-					getProgress();
+					progress(++completedCount, total);
 					_load(echelon[++id], callback, length);
 				}
 			};
@@ -177,8 +176,8 @@ var Preload = function(opts) {
 
 	//获取进度条
 	var getProgress = function() {
-		++completedCount ;
-		console.log(Math.floor((completedCount  / total) * 100));
+		++completedCount;
+		//console.log(Math.floor((completedCount / total) * 100));
 	};
 
 	//判断是否是图片
