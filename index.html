@@ -4,29 +4,15 @@
 	<meta charset="UTF-8">
 	<title>preload</title>
 
-	<style>
-		.a{
-			background: url("./src/image/b4.jpg");
-			width: 640px;
-			height: 1010px;
-		}
-		.b{
-			background: url("./b1.jpg");
-			width: 640px;
-			height: 1010px;
-		}
-	</style>
 </head>
 <body>
 
 	<p id="pro"></p>
 	
-	<div class="a"></div>
 
 
 
-
-	<script src="./dist/js/preload.js"></script>
+	<script src="./src/js/preload.js"></script>
 
 	<script>
 
@@ -62,16 +48,16 @@
 				imgs2:{
 					source:[
 						"./src/image/b3.jpg",
-						"./src/image/b4.jpg",
-						"http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
-						"http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
+						"./src/image/b4.jpg"
 					],
 					callback: function(){
 						//alert(2);
 					}
 				}
 			},
-			wrap: 'pro'
+			progress: function(e){
+
+			}
 		});
 
 		//console.log(preload.getProgress());

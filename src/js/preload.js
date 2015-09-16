@@ -46,8 +46,8 @@ var Preload = function(opts) {
 	"use strict";
 
 	var sources = opts.sources || null, 		
-		wrap = opts.wrap || null,						//进度条容器
-		progress = 0,									//进度条
+		progress = opts.progress || null,				//进度条回调函数
+		completedCount  = 0,							//已加载的资源数
 		total = 0,										//资源总数
 		config,											//请求参数
 		id = 0,											//自增ID
@@ -99,6 +99,8 @@ var Preload = function(opts) {
 	var _initData = function() {
 		if(sources === null) return; 
 
+		config.xhr = _createXHR();
+		
 		//梯队总数
 		echetotal = Object.getOwnPropertyNames(sources).length;
 
@@ -152,7 +154,6 @@ var Preload = function(opts) {
 			}
 		}else{
 
-			config.xhr = _createXHR();
 			
 			config.xhr.onreadystatechange = function() {
 				if (config.xhr.readyState == 4){
@@ -176,8 +177,8 @@ var Preload = function(opts) {
 
 	//获取进度条
 	var getProgress = function() {
-		++progress;
-		wrap.innerHTML = Math.floor((progress / total) * 100);
+		++completedCount ;
+		console.log(Math.floor((completedCount  / total) * 100));
 	};
 
 	//判断是否是图片
