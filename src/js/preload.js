@@ -48,7 +48,7 @@ var Preload = function(opts) {
 	"use strict";
 
 	var sources = opts.sources || null, 		
-		progress = opts.progress || null,				//进度条回调
+		progress = opts.progress || function(){},				//进度条回调
 		completedCount = 0,								//已加载资源总数
 		total = 0,										//资源总数
 		config,											//请求参数
@@ -112,24 +112,38 @@ var Preload = function(opts) {
 				echelon.push(sources[i].source[j]);
 			}
 			echelonlen.push(sources[i].source.length);
-			echeloncb.push(sources[i].callback);
+
+			//console.log(i, sources[i].callback);
+
+
+			echeloncb.push(typeof sources[i].callback == 'undefined' ? null : sources[i].callback);
 		}
+
 
 		//梯队回调标示位置
 		for(var i = 1, len = echelonlen.length; i < len; i++){
-			echelonlen[i] = echelonlen[i - 1] + echelonlen[i]; 
+			echelonlen[i] = echelonlen[i - 1] + echelonlen[i];
 		}
 
 		//资源总数
 		total = echelon.length;
+
+		// console.log('echelon', echelon);
+		// console.log('echelonlen', echelonlen);
+		// console.log('echeloncb', echeloncb);
 
 	};
 
 	//递归加载单个梯队的资源
 	var _load = function(res, callback, length) {
 
+		// console.log(res+'----'+callback);
 		if(id >= length[flag]){
-			echeloncb[flag]();
+		// console.log(echeloncb[flag]);
+			if(echeloncb[flag] != null){
+				echeloncb[flag]();
+			}
+				// console.log('echeloncb[flag]',echeloncb[flag]);
 			++flag;
 		}
 
@@ -172,12 +186,6 @@ var Preload = function(opts) {
 			config.xhr.send(null);
 		}
 		
-	};
-
-	//获取进度条
-	var getProgress = function() {
-		++completedCount;
-		//console.log(Math.floor((completedCount / total) * 100));
 	};
 
 	//判断是否是图片
