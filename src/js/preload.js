@@ -24,6 +24,18 @@
 *			callback: function() {
 *				//alert(2);
 *			}
+*
+*		},
+*		connector: {
+*			int1: {
+*				url: 'http://localhost1/tcc/index.php?callback=read&city=上海市',
+*				jsonp: true
+*			},
+*			int2: {
+*				url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
+*				jsonp: false
+*			}
+*
 *		},
 *		imgs2: {
 *			source: [
@@ -47,8 +59,9 @@ var Preload = function(opts) {
 
 	"use strict";
 
-	var sources = opts.sources || null, 		
-		progress = opts.progress || function(){},				//进度条回调
+	var sources = opts.sources || null,
+		connector = opts.connector || null,				//接口数据		
+		progress = opts.progress || function(){},		//进度条回调
 		completedCount = 0,								//已加载资源总数
 		total = 0,										//资源总数
 		config,											//请求参数
@@ -59,18 +72,22 @@ var Preload = function(opts) {
 		echetotal,										//梯队总数
 		echelonlen = [],								//梯队长度
 		allowType = ['jpg', 'png', 'gif'],				//允许加载的图片类型
-
-	config = {
-		xhr: null,
-		timeOut: 10,
-		id: 0,											//超时标示
-		max: 3											//超时最高次数
-	};
+		config = {
+			xhr: null,
+			timeOut: 10,
+			id: 0,											//超时标示
+			max: 3											//超时最高次数
+		},
+		head = document.getElementsByTagName("head")[0];
 
 	var init = function() {
 		_initData(); //初始化资源参数
+		if(connector != null){
+			_getData();
+		}
 
-		_load(echelon[0], echeloncb[0], echelonlen);
+		_load(echelon[0], echeloncb[0], echelonlen);	//开始请求资源
+
 	};
 
 	var _createXHR = function() {
@@ -188,6 +205,18 @@ var Preload = function(opts) {
 		
 	};
 
+	//获取接口数据
+	var _getData = function(){
+		// console.log(connector);
+		for(var i in connector){
+			if(connector[i].jsonp){
+				asynGetData(connector[i].url);
+			}else{
+				syncGetData(connector[i].url)
+			}
+		}
+	}
+
 	//判断是否是图片
 	var isImg = function(res) {
 		var type = res.split('.').pop();
@@ -196,6 +225,42 @@ var Preload = function(opts) {
 		}
 		return false;
 	};
+
+	//同步获取数据
+	var syncGetData = function(url){
+		config.xhr = _createXHR();
+		config.xhr.onreadystatechange = function() {
+			if (config.xhr.readyState == 4) {
+				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
+					console.log(config.xhr.responseText);
+				}
+			}
+		}
+
+		config.xhr.open("GET", url, true);
+
+		config.xhr.send(null);
+	}
+
+	//异步获取数据
+	var asynGetData = function(url){
+		var script = document.createElement("script");
+		script.src = url;
+		head.appendChild(script);
+
+		script.onload = function() {
+			// 移除该script
+			script.parentNode.removeChild(script);
+
+			// 删除该script
+			script = null;
+
+			// 删除方法
+			// window.read = null;
+
+			
+		}
+	}
 
 	init();
 };

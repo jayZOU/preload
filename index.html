@@ -14,14 +14,15 @@
 	<!--
 	<script src="./src/js/preload.js"></script>
 	-->
-	<script src="./src/js/preload.js"></script>
+	<script src="./dist/js/preload.js"></script>
 	<script>
 
 	/**
 	*	Preload 资源预加载组件
 	*	@class Preload
 	*	@param {object}	sources		必填	加载队列容器，支持队列加载以及加载一个队列后传入回调
-	*	@param {string}	wrap		选填	进度条容器，返回记载进度信息
+	*   @param {object} connector   选填    后台数据接口，可选择同步或异步
+	*	@param {object}	wrap		选填	进度条容器，返回记载进度信息
 	*
 	*
 	**/
@@ -53,11 +54,26 @@
 					}
 				}
 			},
+			connector: {
+				int1: {
+					url: 'http://localhost1/tcc/index.php?callback=read&city=上海市',
+					jsonp: true
+				},
+				int2: {
+					url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
+					jsonp: false
+				}
+
+			},
 			progress: function(completedCount, total){
 				console.log(Math.floor((completedCount / total) * 100));
 			}
 		});
 
+
+		function read(){
+			console.log(arguments[0])
+		}
 
 		//console.log(preload.getProgress());
 	</script>
