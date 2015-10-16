@@ -3,12 +3,19 @@
 <head>
 	<meta charset="UTF-8">
 	<title>preload</title>
+	<style>
+		.a{
+			background: url('./src/image/b1.jpg');
+			width: 200px;
+			height: 200px;
+		}
+	</style>
 
 </head>
 <body>
 
 	<p id="pro"></p>
-	
+	<div class="a"></div>
 
 
 	<!--
@@ -30,26 +37,10 @@
 			sources: {
 				imgs:{
 					source:[
-						"./src/image/b2.jpg",
 						"./src/image/b1.jpg"
 					],
 					callback: function(){
-						alert(1);
-					}
-				},
-				audio:{
-					source:[
-						"./src/audio/a.mp3",
-						"./src/audio/b.mp3"
-					]
-				},
-				imgs2:{
-					source:[
-						"./src/image/b3.jpg",
-						"./src/image/b4.jpg"
-					],
-					callback: function(){
-						alert(3);
+						// alert(1);
 					}
 				}
 			},
