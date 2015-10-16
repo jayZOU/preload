@@ -33,7 +33,10 @@
 *			},
 *			int2: {
 *				url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
-*				jsonp: false
+*				jsonp: false,
+*				callback: function(data){
+*					console.log(data);
+*				}
 *			}
 *
 *		},
@@ -212,7 +215,7 @@ var Preload = function(opts) {
 			if(connector[i].jsonp){
 				asynGetData(connector[i].url);
 			}else{
-				syncGetData(connector[i].url)
+				syncGetData(connector[i].url, connector[i].callback)
 			}
 		}
 	}
@@ -227,12 +230,13 @@ var Preload = function(opts) {
 	};
 
 	//同步获取数据
-	var syncGetData = function(url){
+	var syncGetData = function(url, callback){
 		config.xhr = _createXHR();
 		config.xhr.onreadystatechange = function() {
 			if (config.xhr.readyState == 4) {
 				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
-					console.log(config.xhr.responseText);
+					// console.log(config.xhr.responseText);
+					callback(config.xhr.responseText)
 				}
 			}
 		}

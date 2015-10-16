@@ -17,11 +17,11 @@
     /**
 	*	Preload 资源预加载组件
 	*	@author jayzou
-	*	@time 2015-10-15
-	*	@version 1.0.0
+	*	@time 2015-10-16
+	*	@version 1.0.1
 	*	@class Preload
 	*	@param {object}	sources		必填	加载队列容器，支持队列加载以及加载一个队列后传入回调
-	*   @param {object} connector   选填    后台数据接口，可选择同步或异步
+	*   @param {object} connector   选填    后台数据接口，可选择同步或异步，同步需要传入回调
 	*	@param {object}	wrap		选填	进度条容器，返回记载进度信息
 	**/
 
@@ -61,7 +61,10 @@
 			},
 			int2: {
     			url: 'http://localhost/test/index.php?callback=read&city=深圳市',
-				jsonp: false
+				jsonp: false,
+				callback: function(data){
+					console.log(data);
+				}
 			}
 		},
 		progress: function(completedCount, total){
