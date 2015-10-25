@@ -81,7 +81,11 @@ var Preload = function(opts) {
 			id: 0,											//超时标示
 			max: 3											//超时最高次数
 		},
-		head = document.getElementsByTagName("head")[0];
+		head = document.getElementsByTagName("head")[0],
+
+		//img标签预加载
+		imgNode = [],
+		imgNodePSrc = [];
 
 	var init = function() {
 		_initData(); //初始化资源参数
@@ -133,8 +137,6 @@ var Preload = function(opts) {
 			}
 			echelonlen.push(sources[i].source.length);
 
-			//console.log(i, sources[i].callback);
-
 
 			echeloncb.push(typeof sources[i].callback == 'undefined' ? null : sources[i].callback);
 		}
@@ -148,22 +150,23 @@ var Preload = function(opts) {
 		//资源总数
 		total = echelon.length;
 
-		// console.log('echelon', echelon);
-		// console.log('echelonlen', echelonlen);
-		// console.log('echeloncb', echeloncb);
+		//处理img标签的预加载
+		imgNode = document.getElementsByTagName('img');			//获取img标签节点
+		for(var i = 0, len = imgNode.length; i < len; i++){
+			if(imgNode[i].attributes.pSrc){
+				imgNodePSrc[i] = imgNode[i].attributes.pSrc.value;
+			}
+		}
 
 	};
 
 	//递归加载单个梯队的资源
 	var _load = function(res, callback, length) {
 
-		// console.log(res+'----'+callback);
 		if(id >= length[flag]){
-		// console.log(echeloncb[flag]);
 			if(echeloncb[flag] != null){
 				echeloncb[flag]();
 			}
-				// console.log('echeloncb[flag]',echeloncb[flag]);
 			++flag;
 		}
 
@@ -176,6 +179,14 @@ var Preload = function(opts) {
 			//加载成功后执行
 			img.onload = function () {
 				progress(++completedCount, total);
+
+				for(var i = 0, len = imgNodePSrc.length; i < len; i++){
+					if(imgNodePSrc[i] == res){
+						imgNode[i].src =  imgNodePSrc[i];
+						break;
+					}
+				}
+
 				_load(echelon[++id], callback, length);
 			}
 
@@ -210,7 +221,6 @@ var Preload = function(opts) {
 
 	//获取接口数据
 	var _getData = function(){
-		// console.log(connector);
 		for(var i in connector){
 			if(connector[i].jsonp){
 				asynGetData(connector[i].url);
@@ -235,7 +245,6 @@ var Preload = function(opts) {
 		config.xhr.onreadystatechange = function() {
 			if (config.xhr.readyState == 4) {
 				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
-					// console.log(config.xhr.responseText);
 					callback(config.xhr.responseText)
 				}
 			}
