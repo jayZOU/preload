@@ -8,7 +8,7 @@
 
 ##Install
 
-    git clone https://github.com/jayZOU/preload.git
+    git clone https://github.com/jayZOU/preload/tree/dev
     npm install
     gulp
     
