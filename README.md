@@ -13,6 +13,7 @@
     gulp
     
 访问[http://localhost:8080/][1]
+
 ##Examples
 ```html
     <img pSrc="./src/image/b1.jpg" alt="">
