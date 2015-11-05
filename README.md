@@ -28,10 +28,10 @@
 	*	@time 2015-11-5
 	*	@version 1.0.2
 	*	@class Preload
-	*	@param {object}	sources				必填  	加载队列容器，支持队列加载以及加载一个队列后传入回调
-	*   @param {object} connector   		选填  	后台数据接口，可选择同步或异步
-	*   @param int 		loadingOverTime  	选填  	预加载超时时间，默认15， 单位:秒
-	*   @param {object} loadingOverTimeCB   选填  	预加载超时回调
+	*	@param {object}	sources				必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
+	*   @param {object} connector   		选填  后台数据接口，可选择同步或异步
+	*   @param int 		loadingOverTime  	选填  预加载超时时间，默认15， 单位:秒
+	*   @param {object} loadingOverTimeCB   选填  预加载超时回调
 	*	@param {object}	wrap				选填	进度条容器，返回记载进度信息
 	**/
 
