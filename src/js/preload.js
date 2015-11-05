@@ -77,7 +77,8 @@ var Preload = function(opts) {
 		allowType = ['jpg', 'png', 'gif'],				//允许加载的图片类型
 		config = {
 			xhr: null,
-			timeOut: 10,
+			timeOut: opts.loadingOverTime || 15,			//超时时间
+			timeOutCB: opts.loadingOverTimeCB || function(){},	//超时回调
 			id: 0,											//超时标示
 			max: 3											//超时最高次数
 		},
@@ -97,7 +98,7 @@ var Preload = function(opts) {
 
 	};
 
-	var _createXHR = function() {
+	var _createXHR = (function() {
 		if (typeof XMLHttpRequest != "undefined") {
 			return new XMLHttpRequest();
 		} else if (typeof ActiveXObject != "undefined") {
@@ -120,7 +121,7 @@ var Preload = function(opts) {
 		} else {
 			throw new Error("No XHR object available.");
 		}
-	};
+	})();
 
 	var _initData = function() {
 		if(sources === null) return; 
@@ -162,7 +163,7 @@ var Preload = function(opts) {
 
 	//递归加载单个梯队的资源
 	var _load = function(res, callback, length) {
-
+		// createTimer(new Date());
 		if(id >= length[flag]){
 			if(echeloncb[flag] != null){
 				echeloncb[flag]();
@@ -174,10 +175,18 @@ var Preload = function(opts) {
 
 		if(isImg(res)) {
 			var img = new Image();
+			// createTimer(new Date());
+
+			var timer = setTimeout(function () {
+	            config.timeOutCB();
+	        },config.timeOut*1000);
+
 			img.src = res;
 
 			//加载成功后执行
 			img.onload = function () {
+				//加载成功后清理计时器
+				clearTimeout(timer);
 				progress(++completedCount, total);
 
 				for(var i = 0, len = imgNodePSrc.length; i < len; i++){
@@ -197,7 +206,7 @@ var Preload = function(opts) {
 			}
 		}else{
 
-			config.xhr = _createXHR();
+			config.xhr = _createXHR;
 			
 			config.xhr.onreadystatechange = function() {
 				if (config.xhr.readyState == 4){
@@ -241,7 +250,7 @@ var Preload = function(opts) {
 
 	//同步获取数据
 	var syncGetData = function(url, callback){
-		config.xhr = _createXHR();
+		config.xhr = _createXHR;
 		config.xhr.onreadystatechange = function() {
 			if (config.xhr.readyState == 4) {
 				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
@@ -260,20 +269,20 @@ var Preload = function(opts) {
 		var script = document.createElement("script");
 		script.src = url;
 		head.appendChild(script);
+	};
 
-		script.onload = function() {
-			// 移除该script
-			script.parentNode.removeChild(script);
-
-			// 删除该script
-			script = null;
-
-			// 删除方法
-			// window.read = null;
-
-			
-		}
-	}
+	//创建计时器
+	var createTimer = function(time){
+		setTimeout(function(){
+			console.log((new Date() - time));
+			console.log(config.timeOut);
+			if(new Date() - time < config.timeOut * 1000){
+				setTimeout(arguments.callee, 1000);
+			}else{
+				console.log('超时');
+			}
+		}, 50);
+	};
 
 	init();
 };
