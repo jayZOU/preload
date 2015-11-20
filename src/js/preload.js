@@ -286,3 +286,10 @@ var Preload = function(opts) {
 
 	init();
 };
+
+
+if (typeof module == 'object') {
+    module.exports = PhotoTiltSlide;
+} else {
+    window.photoTiltSlide = PhotoTiltSlide;
+}
