@@ -6,13 +6,16 @@
  - 进度条，可以动态获取进度条信息
  - 支持img标签的预加载，添加pSrc属性即可
 
+##Demo
+[Demo][1]
+
 ##Install
 
     git clone https://github.com/jayZOU/preload.git
     npm install
     gulp
     
-访问[http://localhost:8080/][1]
+访问[http://localhost:8080/][2]
 
 ##Examples
 ```html
@@ -95,4 +98,5 @@
 	
 
 
-  [1]: http://localhost:8080/
+  [1]: http://jayzou.coding.io/
+  [2]: http://localhost:8080/

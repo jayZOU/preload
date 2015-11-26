@@ -6,7 +6,7 @@ var gulp = require('gulp'),
 
 gulp.task('connectSrc', function() {
   connect.server({
-    root: '.',
+    root: './demo',
     port: 8080
   });
 });
@@ -14,19 +14,19 @@ gulp.task('connectSrc', function() {
 gulp.task('compress', function() {
   return gulp.src('./src/js/*.js')
     .pipe(uglify())
-    .pipe(gulp.dest('./dist/js'));
+    .pipe(gulp.dest('./demo/'));
 });
 
-gulp.task('babel', function() {
-  return gulp.src('./ES6/*.js')
-    .pipe(babel())
-    //.pipe(uglify())
-    .pipe(gulp.dest('./dist/ES6'));
-})
+// gulp.task('babel', function() {
+//   return gulp.src('./ES6/*.js')
+//     .pipe(babel())
+//     //.pipe(uglify())
+//     .pipe(gulp.dest('./dist/ES6'));
+// })
 
 gulp.task('watch', function() {
   gulp.watch('./src/js/*.js', ['compress']);
-  gulp.watch('./ES6/*.js', ['babel']);
+  // gulp.watch('./ES6/*.js', ['babel']);
 });
 
 // gulp.task('lint', function() {
@@ -45,4 +45,4 @@ gulp.task('watch', function() {
 //         .pipe(gulp.dest('./src/build/'))
 // });
 
-gulp.task('default', ['watch', 'connectSrc', 'compress', 'babel']);
+gulp.task('default', ['watch', 'connectSrc', 'compress']);
