@@ -63,24 +63,25 @@ var Preload = function(opts) {
 	"use strict";
 
 	var sources = opts.sources || null,
-		connector = opts.connector || null,				//接口数据		
-		progress = opts.progress || function(){},		//进度条回调
-		completedCount = 0,								//已加载资源总数
-		total = 0,										//资源总数
-		config,											//请求参数
-		id = 0,											//自增ID
-		flag = 0,										//标示梯队
-		echelon = [],									//梯队加载资源
-		echeloncb = [],									//梯队加载后的回调
-		echetotal,										//梯队总数
-		echelonlen = [],								//梯队长度
-		allowType = ['jpg', 'png', 'gif'],				//允许加载的图片类型
+		connector = opts.connector || null,						//接口数据		
+		progress = opts.progress || function(){},				//进度条回调
+		completeLoad = opts.completeLoad || function(){},		//进度条回调
+		completedCount = 0,										//已加载资源总数
+		total = 0,												//资源总数
+		config,													//请求参数
+		id = 0,													//自增ID
+		flag = 0,												//标示梯队
+		echelon = [],											//梯队加载资源
+		echeloncb = [],											//梯队加载后的回调
+		echetotal,												//梯队总数
+		echelonlen = [],										//梯队长度
+		allowType = ['jpg', 'png', 'gif'],						//允许加载的图片类型
 		config = {
 			xhr: null,
-			timeOut: opts.loadingOverTime || 15,			//超时时间
+			timeOut: opts.loadingOverTime || 15,				//超时时间
 			timeOutCB: opts.loadingOverTimeCB || function(){},	//超时回调
-			id: 0,											//超时标示
-			max: 3											//超时最高次数
+			id: 0,												//超时标示
+			max: 3												//超时最高次数
 		},
 		head = document.getElementsByTagName("head")[0],
 
@@ -171,7 +172,10 @@ var Preload = function(opts) {
 			++flag;
 		}
 
-		if(flag >= echetotal) return;
+		if(flag >= echetotal) {
+			completeLoad();
+			return;
+		}
 
 		if(isImg(res)) {
 			var img = new Image();

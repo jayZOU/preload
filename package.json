@@ -1,16 +1,31 @@
 {
   "name": "preload",
-  "version": "0.0.4",
-  "description": "A preload component",
-  "author": "jay",
+  "version": "1.0.2",
+  "description": "a preload component",
+  "main": "gulpfile.js",
   "dependencies": {
     "gulp": "^3.9.0",
-    "gulp-babel": "^5.2.1"
-  },
-  "main": "index",
-  "devDependencies": {
     "gulp-connect": "^2.2.0",
-    "gulp-uglify": "^1.4.1",
-    "watchify": "^3.3.1"
-  }
+    "gulp-uglify": "^1.5.1",
+    "watchify": "^3.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jayZOU/preload.git"
+  },
+  "keywords": [
+    "preload",
+    "compinent",
+    "h5"
+  ],
+  "author": "jayzou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jayZOU/preload/issues"
+  },
+  "homepage": "https://github.com/jayZOU/preload"
 }

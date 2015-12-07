@@ -1,7 +1,6 @@
 var gulp = require('gulp'),
   connect = require('gulp-connect'),
   uglify = require('gulp-uglify'),
-  babel = require('gulp-babel'),
   watchify = require('watchify');
 
 gulp.task('connectSrc', function() {
