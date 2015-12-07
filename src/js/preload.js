@@ -87,7 +87,11 @@ var Preload = function(opts) {
 
 		//img标签预加载
 		imgNode = [],
-		imgNodePSrc = [];
+		imgNodePSrc = [],
+
+		//audio标签预加载
+		audioNode = [],
+		audioNodePSrc = [];
 
 	var init = function() {
 		_initData(); //初始化资源参数
@@ -160,6 +164,18 @@ var Preload = function(opts) {
 			}
 		}
 
+		audioNode = document.getElementsByTagName('audio');			//获取img标签节点
+		for(var i = 0, len = audioNode.length; i < len; i++){
+			if(audioNode[i].attributes.pSrc){
+				audioNodePSrc[i] = audioNode[i].attributes.pSrc.value;
+			}
+		}
+		// console.log(imgNode);
+		// console.log(imgNodePSrc);
+
+		// console.log(audioNode);
+		// console.log(audioNodePSrc);
+
 	};
 
 	//递归加载单个梯队的资源
@@ -217,6 +233,14 @@ var Preload = function(opts) {
 					if((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304){
 
 						progress(++completedCount, total);
+
+						for(var i = 0, len = audioNodePSrc.length; i < len; i++){
+							if(audioNodePSrc[i] == res){
+								audioNode[i].src =  audioNodePSrc[i];
+								break;
+							}
+						}
+
 						_load(echelon[++id], callback, length);
 					}
 				}else if(config.xhr.status >= 400 && config.xhr.status < 500){
