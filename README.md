@@ -36,7 +36,7 @@
 	*   @param int 		loadingOverTime  	选填  预加载超时时间，默认15， 单位:秒
 	*   @param {object} loadingOverTimeCB   选填  预加载超时回调
 	*	@param {object}	wrap				选填	进度条容器，返回记载进度信息
-	*	@param {object}	complete			选填	完成所有加载项执行回调，包括同、异步获取数据
+	*	@param {object}	completeLoad		选填	完成所有加载项执行回调，包括同、异步获取数据
 	**/
 
     var preload = new Preload({
@@ -85,7 +85,7 @@
 		progress: function(completedCount, total){
 			console.log(Math.floor((completedCount / total) * 100));
 		},
-		complete: function(){
+		completeLoad: function(){
 		    console.log("已完成所有加载项");
 		}
 	});
