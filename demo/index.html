@@ -80,12 +80,15 @@
 	        },
 	        connector: {
 	            int1: {
-	                url: 'http://localhost/test/index.php?callback=read&city=上海市',
+	                url: 'http://localhost/tcc/index.php?callback=read&city=上海市',
 	                jsonp: true
 	            },
 	            int2: {
-	                url: 'http://localhost/test/index.php?callback=read&city=深圳市',
-	                jsonp: false
+	                url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
+	                jsonp: false,
+	                callback: function(data){
+	                	console.log(data);
+	                }
 	            }
 	        },
 	        progress: function(completedCount, total){
@@ -95,6 +98,10 @@
 	            console.log("已完成所有加载项");
 	        }
 	    });
+
+		function read(){
+			console.log(arguments[0])
+		}
 
 	</script>
 

@@ -6,6 +6,7 @@ var Preload = function(opts) {
 	this.opts = {
 		sources: null,											//预加载资源总队列
 		progress: function(){},									//进度条回调
+        connector:  null, //接口数据		
 		completeLoad: function(){},								//加载完成回调
 		config: {
 			timeOut: opts.loadingOverTime || 15,				//超时时间
@@ -37,6 +38,9 @@ var Preload = function(opts) {
 		//audio标签预加载
 		audioNode: [],
 		audioNodePSrc: [],
+
+		//异步调用接口数据
+        head: document.getElementsByTagName("head")[0],
 	}
 
 	for (var i in opts) {
@@ -56,6 +60,11 @@ Preload.prototype = {
 
 		//初始化资源参数
 		self._initData();
+
+		//调用接口数据
+		if (opts.connector != null) {
+            self._getData();
+        }
 
 		//开始预加载资源
 		self._load(params.echelon[0], params.echeloncb[0], params.echelonlen);			
@@ -237,6 +246,51 @@ Preload.prototype = {
 
 		// self._load(params.echelon[++params.id], callback, length);
 	},
+
+	//获取接口数据
+    _getData: function() {
+
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+
+        for (var i in opts.connector) {
+            if (opts.connector[i].jsonp) {
+                self.asynGetData(opts.connector[i].url);
+            } else {
+                self.syncGetData(opts.connector[i].url, opts.connector[i].callback)
+            }
+        }
+    },
+
+    //同步获取数据
+    syncGetData: function(url, callback) {
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+        // config.xhr = _createXHR;
+        params._createXHR.onreadystatechange = function() {
+            if (params._createXHR.readyState == 4) {
+                if ((params._createXHR.status >= 200 && params._createXHR.status < 300) || params._createXHR.status === 304) {
+                    callback(params._createXHR.responseText)
+                }
+            }
+        }
+
+        params._createXHR.open("GET", url, true);
+
+        params._createXHR.send(null);
+    },
+
+    //异步获取数据
+    asynGetData: function(url) {
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+        var script = document.createElement("script");
+        script.src = url;
+        params.head.appendChild(script);
+    },
 
 	getXHR: function(){
 		if (typeof XMLHttpRequest != "undefined") {

@@ -6,8 +6,6 @@
  - 进度条，可以动态获取进度条信息
  - 支持img标签的预加载，添加pSrc属性即可
 
-##Demo
-[Demo][1]
 
 ##Install
 
@@ -30,15 +28,15 @@
     /**
 	*	Preload 资源预加载组件
 	*	@author jayzou
-	*	@time 2015-12-7
-	*	@version 1.0.4
+	*	@time 2016-1-4
+	*	@version 2.0.1
 	*	@class Preload
 	*	@param {object}	sources				必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
 	*   @param {object} connector   		选填  后台数据接口，可选择同步或异步
 	*   @param int 		loadingOverTime  	选填  预加载超时时间，默认15， 单位:秒
 	*   @param {object} loadingOverTimeCB   选填  预加载超时回调
 	*	@param {object}	wrap				选填	进度条容器，返回记载进度信息
-	*	@param {object}	complete			选填	完成所有加载项执行回调，包括同、异步获取数据
+	*	@param {object}	completeLoad		选填	完成所有加载项执行回调，包括同、异步获取数据
 	**/
 
     var preload = new Preload({
@@ -87,7 +85,7 @@
 		progress: function(completedCount, total){
 			console.log(Math.floor((completedCount / total) * 100));
 		},
-		complete: function(){
+		completeLoad: function(){
 		    console.log("已完成所有加载项");
 		}
 	});
