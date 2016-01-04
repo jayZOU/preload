@@ -1,109 +1,244 @@
-/**
-*@description 资源预加载loading
-*@name Preload
-*@author shijiezou
-*---------------------------------
-*@default config
-*
-*var preload = new Preload({
-*	sources: {
-*		imgs: {
-*			source: [
-*				"./b2.jpg",
-*				"./b1.jpg"
-*			],
-*			callback: function() {
-*				//alert(1);
-*			}
-*		},
-*		audio: {
-*			source: [
-*				"./a.mp3",
-*				"./b.mp3"
-*			],
-*			callback: function() {
-*				//alert(2);
-*			}
-*
-*		},
-*		connector: {
-*			int1: {
-*				url: 'http://localhost1/tcc/index.php?callback=read&city=上海市',
-*				jsonp: true
-*			},
-*			int2: {
-*				url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
-*				jsonp: false,
-*				callback: function(data){
-*					console.log(data);
-*				}
-*			}
-*
-*		},
-*		imgs2: {
-*			source: [
-*				"./b3.jpg",
-*				"./b4.jpg",
-*				"http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
-*				"http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
-*			],
-*			callback: function() {
-*				//alert(3);
-*			}
-*		}
-*	},
-*	wrap: function(completedCount, total){
-*		console.log(Math.floor((completedCount / total) * 100));
-*	}
-*});
-*
-**/
 var Preload = function(opts) {
 
 	"use strict";
 
-	var sources = opts.sources || null,
-		connector = opts.connector || null,						//接口数据		
-		progress = opts.progress || function(){},				//进度条回调
-		completeLoad = opts.completeLoad || function(){},		//进度条回调
-		completedCount = 0,										//已加载资源总数
-		total = 0,												//资源总数
-		config,													//请求参数
-		id = 0,													//自增ID
-		flag = 0,												//标示梯队
-		echelon = [],											//梯队加载资源
-		echeloncb = [],											//梯队加载后的回调
-		echetotal,												//梯队总数
-		echelonlen = [],										//梯队长度
-		allowType = ['jpg', 'png', 'gif'],						//允许加载的图片类型
-		config = {
-			xhr: null,
+	//可修改参数
+	this.opts = {
+		sources: null,											//预加载资源总队列
+		progress: function(){},									//进度条回调
+		completeLoad: function(){},								//加载完成回调
+		config: {
 			timeOut: opts.loadingOverTime || 15,				//超时时间
 			timeOutCB: opts.loadingOverTimeCB || function(){},	//超时回调
-			id: 0,												//超时标示
-			max: 3												//超时最高次数
 		},
-		head = document.getElementsByTagName("head")[0],
+
+	}
+
+	//业务逻辑所需参数
+	this.params = {
+		echetotal: 0,											//队列总数
+		echelon: [],											//队列资源列表
+		echelonlen: [],											//记录每个队列长度
+		echeloncb: [],											//队列回调标示
+
+		id: 0,													//自增ID
+		flag: 0,												//标示梯队
+
+		allowType: ['jpg', 'jpeg', 'png', 'gif'],				//允许加载的图片类型
+		total: 0,												//资源总数
+		completedCount: 0,										//已加载资源总数
+
+		_createXHR: null,										//Ajax初始化
 
 		//img标签预加载
-		imgNode = [],
-		imgNodePSrc = [],
+		imgNode: [],
+		imgNodePSrc: [],
 
 		//audio标签预加载
-		audioNode = [],
-		audioNodePSrc = [];
+		audioNode: [],
+		audioNodePSrc: [],
+	}
 
-	var init = function() {
-		_initData(); //初始化资源参数
-		if(connector != null){
-			_getData();
+	for (var i in opts) {
+		this.opts[i] = opts[i];
+	}
+
+	// console.log(opts);
+
+	this._init();
+}
+
+Preload.prototype = {
+	_init: function(){
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+
+		//初始化资源参数
+		self._initData();
+
+		//开始预加载资源
+		self._load(params.echelon[0], params.echeloncb[0], params.echelonlen);			
+	},
+
+	_initData: function(){
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+
+
+		if(opts.sources === null) return;
+
+		params.echetotal = Object.getOwnPropertyNames(opts.sources).length;
+
+		//处理梯队资源和回调
+		for(var i in opts.sources){
+
+			for(var j = 0, len = opts.sources[i].source.length; j < len; j++){
+				params.echelon.push(opts.sources[i].source[j]);
+				// console.log(opts.sources[i].source[j]);
+			}
+			// console.log(1);
+			params.echelonlen.push(opts.sources[i].source.length);
+
+
+			params.echeloncb.push(typeof opts.sources[i].callback == 'undefined' ? null : opts.sources[i].callback);
 		}
 
-		_load(echelon[0], echeloncb[0], echelonlen);	//开始请求资源
+		//Ajax初始化
+		params._createXHR = self.getXHR();
 
-	};
+		//梯队回调标示位置
+		for(var i = 1, len = params.echelonlen.length; i < len; i++){
+			params.echelonlen[i] = params.echelonlen[i - 1] + params.echelonlen[i];
+		}
 
-	var _createXHR = (function() {
+		//资源总数
+		params.total = params.echelon.length;
+
+		//处理img标签的预加载
+		params.imgNode = document.getElementsByTagName('img');			//获取img标签节点
+		for(var i = 0, len = params.imgNode.length; i < len; i++){
+			if(params.imgNode[i].attributes.pSrc){
+				params.imgNodePSrc[i] = params.imgNode[i].attributes.pSrc.value;
+			}
+		}
+
+		//处理audio标签的预加载
+		params.audioNode = document.getElementsByTagName('audio');			//获取img标签节点
+		for(var i = 0, len = params.audioNode.length; i < len; i++){
+			if(params.audioNode[i].attributes.pSrc){
+				params.audioNodePSrc[i] = params.audioNode[i].attributes.pSrc.value;
+			}
+		}
+
+		// console.log(opts.sources);
+		// console.log("params.echetotal", params.echetotal);
+		// console.log("params.echelon", params.echelon);
+		// console.log("params.echelonlen", params.echelonlen);
+		// console.log("params.echeloncb", params.echeloncb);
+		// console.log("params._createXHR", params._createXHR);
+		// console.log("params.total", params.total);
+		// console.log("params.imgNode", params.imgNode);
+		// console.log("params.imgNodePSrc", params.imgNodePSrc);
+		// console.log("params.audioNode", params.audioNode);
+		// console.log("params.audioNodePSrc", params.audioNodePSrc);
+	},
+
+	_load: function(res, callback, length){
+		var self = this,
+			opts = self.opts,
+			params = self.params;
+
+		/*	用于判断是否已加载完当前队列的所有资源，
+		*		若已加载完成，
+		*			判断是否传入回调，
+		*				有则执行回调
+		*				无继续下一队列或退出
+		*/
+		if(params.id >= length[params.flag]){
+			if(params.echeloncb[params.flag] != null){
+				params.echeloncb[params.flag]();
+			}
+			++params.flag;
+		}
+
+		/*
+		*	用于判断当前加载是否达到最大资源数
+		*		YES,执行加载完成回调
+		*/
+		// console.log("id=",params.id);
+		// console.log("echetotal=",params.total);
+		// console.log("res=",res);
+		if(params.id >= params.total) {
+
+			opts.completeLoad();
+			return;
+		}
+		
+
+		/*
+		*	判断是否是图片类型
+		*		YES，使用new Image加载
+		*		NO，使用Ajax加载
+		*/
+
+		if(self.isImg(res)) {
+			// console.log(1);
+			var img = new Image();
+			// createTimer(new Date());
+
+			var timer = setTimeout(function () {
+	            opts.config.timeOutCB();
+	        },opts.config.timeOut*1000);
+
+			img.src = res;
+
+			//加载成功后执行
+			img.onload = function () {
+				//加载成功后清理计时器
+				clearTimeout(timer);
+				opts.progress(++params.completedCount, params.total);
+
+				for(var i = 0, len = params.imgNodePSrc.length; i < len; i++){
+					if(params.imgNodePSrc[i] == res){
+						params.imgNode[i].src =  params.imgNodePSrc[i];
+						break;
+					}
+				}
+
+				self._load(params.echelon[++params.id], callback, length);
+			}
+
+			//加载失败后执行
+			img.onerror = function() {
+				opts.progress(++completedCount, total);
+				self._load(params.echelon[++params.id], callback, length);
+			}
+
+		}else{
+			params._createXHR.onreadystatechange = function() {
+				if (params._createXHR.readyState == 4){
+					if((params._createXHR.status >= 200 && params._createXHR.status < 300) || params._createXHR.status === 304){
+
+						opts.progress(++params.completedCount, params.total);
+
+						for(var i = 0, len = params.audioNodePSrc.length; i < len; i++){
+							if(params.audioNodePSrc[i] == res){
+								params.audioNode[i].src =  params.audioNodePSrc[i];
+								break;
+							}
+						}
+
+						self._load(params.echelon[++params.id], callback, length);
+					}
+				}else if(params._createXHR.status >= 400 && params._createXHR.status < 500){
+					opts.progress(++params.completedCount, params.total);
+					self._load(params.echelon[++params.id], callback, length);
+				}
+			};
+
+			params._createXHR.open("GET", res, true);
+
+			// params.responseType = "arraybuffer";
+
+			params._createXHR.send(null);
+
+
+			// opts.progress(++params.completedCount, params.total);
+			// self._load(params.echelon[++params.id], callback, length);
+			// console.log(0);
+
+		}
+
+
+		// console.log("params.flag",params.flag);
+		// console.log("params.echetotal",params.echetotal);
+
+		// self._load(params.echelon[++params.id], callback, length);
+	},
+
+	getXHR: function(){
 		if (typeof XMLHttpRequest != "undefined") {
 			return new XMLHttpRequest();
 		} else if (typeof ActiveXObject != "undefined") {
@@ -126,195 +261,20 @@ var Preload = function(opts) {
 		} else {
 			throw new Error("No XHR object available.");
 		}
-	})();
+	},
 
-	var _initData = function() {
-		if(sources === null) return; 
+	isImg: function(res) {
+		var self = this,
+			opts = self.opts,
+			params = self.params,
+		 	type = res.split('.').pop();
 
-		//梯队总数
-		echetotal = Object.getOwnPropertyNames(sources).length;
-
-
-		//处理梯队资源和回调
-		for(var i in sources){
-
-			for(var j = 0, len = sources[i].source.length; j < len; j++){
-				echelon.push(sources[i].source[j]);
-			}
-			echelonlen.push(sources[i].source.length);
-
-
-			echeloncb.push(typeof sources[i].callback == 'undefined' ? null : sources[i].callback);
-		}
-
-
-		//梯队回调标示位置
-		for(var i = 1, len = echelonlen.length; i < len; i++){
-			echelonlen[i] = echelonlen[i - 1] + echelonlen[i];
-		}
-
-		//资源总数
-		total = echelon.length;
-
-		//处理img标签的预加载
-		imgNode = document.getElementsByTagName('img');			//获取img标签节点
-		for(var i = 0, len = imgNode.length; i < len; i++){
-			if(imgNode[i].attributes.pSrc){
-				imgNodePSrc[i] = imgNode[i].attributes.pSrc.value;
-			}
-		}
-
-		audioNode = document.getElementsByTagName('audio');			//获取img标签节点
-		for(var i = 0, len = audioNode.length; i < len; i++){
-			if(audioNode[i].attributes.pSrc){
-				audioNodePSrc[i] = audioNode[i].attributes.pSrc.value;
-			}
-		}
-		// console.log(imgNode);
-		// console.log(imgNodePSrc);
-
-		// console.log(audioNode);
-		// console.log(audioNodePSrc);
-
-	};
-
-	//递归加载单个梯队的资源
-	var _load = function(res, callback, length) {
-		// createTimer(new Date());
-		if(id >= length[flag]){
-			if(echeloncb[flag] != null){
-				echeloncb[flag]();
-			}
-			++flag;
-		}
-
-		if(flag >= echetotal) {
-			completeLoad();
-			return;
-		}
-
-		if(isImg(res)) {
-			var img = new Image();
-			// createTimer(new Date());
-
-			var timer = setTimeout(function () {
-	            config.timeOutCB();
-	        },config.timeOut*1000);
-
-			img.src = res;
-
-			//加载成功后执行
-			img.onload = function () {
-				//加载成功后清理计时器
-				clearTimeout(timer);
-				progress(++completedCount, total);
-
-				for(var i = 0, len = imgNodePSrc.length; i < len; i++){
-					if(imgNodePSrc[i] == res){
-						imgNode[i].src =  imgNodePSrc[i];
-						break;
-					}
-				}
-
-				_load(echelon[++id], callback, length);
-			}
-
-			//加载失败后执行
-			img.onerror = function() {
-				progress(++completedCount, total);
-				_load(echelon[++id], callback, length);
-			}
-		}else{
-
-			config.xhr = _createXHR;
-			
-			config.xhr.onreadystatechange = function() {
-				if (config.xhr.readyState == 4){
-					if((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304){
-
-						progress(++completedCount, total);
-
-						for(var i = 0, len = audioNodePSrc.length; i < len; i++){
-							if(audioNodePSrc[i] == res){
-								audioNode[i].src =  audioNodePSrc[i];
-								break;
-							}
-						}
-
-						_load(echelon[++id], callback, length);
-					}
-				}else if(config.xhr.status >= 400 && config.xhr.status < 500){
-					progress(++completedCount, total);
-					_load(echelon[++id], callback, length);
-				}
-			};
-
-			config.xhr.open("GET", res, true);
-
-			config.xhr.send(null);
-		}
-		
-	};
-
-	//获取接口数据
-	var _getData = function(){
-		for(var i in connector){
-			if(connector[i].jsonp){
-				asynGetData(connector[i].url);
-			}else{
-				syncGetData(connector[i].url, connector[i].callback)
-			}
-		}
-	}
-
-	//判断是否是图片
-	var isImg = function(res) {
-		var type = res.split('.').pop();
-		for (var i = 0, len = allowType.length; i < len; i++) {
-			if (type == allowType[i]) return true;
+		for (var i = 0, len = params.allowType.length; i < len; i++) {
+			if (type == params.allowType[i]) return true;
 		}
 		return false;
-	};
-
-	//同步获取数据
-	var syncGetData = function(url, callback){
-		config.xhr = _createXHR;
-		config.xhr.onreadystatechange = function() {
-			if (config.xhr.readyState == 4) {
-				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
-					callback(config.xhr.responseText)
-				}
-			}
-		}
-
-		config.xhr.open("GET", url, true);
-
-		config.xhr.send(null);
 	}
-
-	//异步获取数据
-	var asynGetData = function(url){
-		var script = document.createElement("script");
-		script.src = url;
-		head.appendChild(script);
-	};
-
-	//创建计时器
-	var createTimer = function(time){
-		setTimeout(function(){
-			console.log((new Date() - time));
-			console.log(config.timeOut);
-			if(new Date() - time < config.timeOut * 1000){
-				setTimeout(arguments.callee, 1000);
-			}else{
-				console.log('超时');
-			}
-		}, 50);
-	};
-
-	init();
-};
-
+}
 
 if (typeof module == 'object') {
     module.exports = Preload;
