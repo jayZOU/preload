@@ -12,7 +12,7 @@ gulp.task('connectSrc', function() {
 
 gulp.task('compress', function() {
   return gulp.src('./src/js/*.js')
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(gulp.dest('./demo/'));
 });
 
