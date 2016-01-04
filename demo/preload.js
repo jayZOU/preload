@@ -1,1 +1,323 @@
-var Preload=function(e){"use strict";var t,r,n=e.sources||null,a=e.connector||null,o=e.progress||function(){},u=e.completeLoad||function(){},i=0,l=0,c=0,s=0,f=[],h=[],g=[],d=["jpg","png","gif"],t={xhr:null,timeOut:e.loadingOverTime||15,timeOutCB:e.loadingOverTimeCB||function(){},id:0,max:3},p=document.getElementsByTagName("head")[0],m=[],v=[],x=[],b=[],X=function(){S(),null!=a&&O(),M(f[0],h[0],g)},y=function(){if("undefined"!=typeof XMLHttpRequest)return new XMLHttpRequest;if("undefined"!=typeof ActiveXObject){if("string"!=typeof arguments.callee.activeXString){var e,t,r=["MSXML2.XMLHttp.6.0","MSXML2.XMLHttp.3.0","MSXML2.XMLHttp"];for(e=0,t=r.length;t>e;e++)try{new ActiveXObject(r[e]),arguments.callee.activeXString=r[e];break}catch(n){}}return new ActiveXObject(arguments.callee.activeXString)}throw new Error("No XHR object available.")}(),S=function(){if(null!==n){r=Object.getOwnPropertyNames(n).length;for(var e in n){for(var t=0,a=n[e].source.length;a>t;t++)f.push(n[e].source[t]);g.push(n[e].source.length),h.push("undefined"==typeof n[e].callback?null:n[e].callback)}for(var e=1,a=g.length;a>e;e++)g[e]=g[e-1]+g[e];l=f.length,m=document.getElementsByTagName("img");for(var e=0,a=m.length;a>e;e++)m[e].attributes.pSrc&&(v[e]=m[e].attributes.pSrc.value);x=document.getElementsByTagName("audio");for(var e=0,a=x.length;a>e;e++)x[e].attributes.pSrc&&(b[e]=x[e].attributes.pSrc.value)}},M=function(e,n,a){if(c>=a[s]&&(null!=h[s]&&h[s](),++s),s>=r)return void u();if(T(e)){var g=new Image,d=setTimeout(function(){t.timeOutCB()},1e3*t.timeOut);g.src=e,g.onload=function(){clearTimeout(d),o(++i,l);for(var t=0,r=v.length;r>t;t++)if(v[t]==e){m[t].src=v[t];break}M(f[++c],n,a)},g.onerror=function(){o(++i,l),M(f[++c],n,a)}}else t.xhr=y,t.xhr.onreadystatechange=function(){if(4==t.xhr.readyState){if(t.xhr.status>=200&&t.xhr.status<300||304===t.xhr.status){o(++i,l);for(var r=0,u=b.length;u>r;r++)if(b[r]==e){x[r].src=b[r];break}M(f[++c],n,a)}}else t.xhr.status>=400&&t.xhr.status<500&&(o(++i,l),M(f[++c],n,a))},t.xhr.open("GET",e,!0),t.xhr.send(null)},O=function(){for(var e in a)a[e].jsonp?L(a[e].url):w(a[e].url,a[e].callback)},T=function(e){for(var t=e.split(".").pop(),r=0,n=d.length;n>r;r++)if(t==d[r])return!0;return!1},w=function(e,r){t.xhr=y,t.xhr.onreadystatechange=function(){4==t.xhr.readyState&&(t.xhr.status>=200&&t.xhr.status<300||304===t.xhr.status)&&r(t.xhr.responseText)},t.xhr.open("GET",e,!0),t.xhr.send(null)},L=function(e){var t=document.createElement("script");t.src=e,p.appendChild(t)};X()};"object"==typeof module?module.exports=Preload:window.Preload=Preload;
+/**
+*@description 资源预加载loading
+*@name Preload
+*@author shijiezou
+*---------------------------------
+*@default config
+*
+*var preload = new Preload({
+*	sources: {
+*		imgs: {
+*			source: [
+*				"./b2.jpg",
+*				"./b1.jpg"
+*			],
+*			callback: function() {
+*				//alert(1);
+*			}
+*		},
+*		audio: {
+*			source: [
+*				"./a.mp3",
+*				"./b.mp3"
+*			],
+*			callback: function() {
+*				//alert(2);
+*			}
+*
+*		},
+*		connector: {
+*			int1: {
+*				url: 'http://localhost1/tcc/index.php?callback=read&city=上海市',
+*				jsonp: true
+*			},
+*			int2: {
+*				url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
+*				jsonp: false,
+*				callback: function(data){
+*					console.log(data);
+*				}
+*			}
+*
+*		},
+*		imgs2: {
+*			source: [
+*				"./b3.jpg",
+*				"./b4.jpg",
+*				"http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
+*				"http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
+*			],
+*			callback: function() {
+*				//alert(3);
+*			}
+*		}
+*	},
+*	wrap: function(completedCount, total){
+*		console.log(Math.floor((completedCount / total) * 100));
+*	}
+*});
+*
+**/
+var Preload = function(opts) {
+
+	"use strict";
+
+	var sources = opts.sources || null,
+		connector = opts.connector || null,						//接口数据		
+		progress = opts.progress || function(){},				//进度条回调
+		completeLoad = opts.completeLoad || function(){},		//进度条回调
+		completedCount = 0,										//已加载资源总数
+		total = 0,												//资源总数
+		config,													//请求参数
+		id = 0,													//自增ID
+		flag = 0,												//标示梯队
+		echelon = [],											//梯队加载资源
+		echeloncb = [],											//梯队加载后的回调
+		echetotal,												//梯队总数
+		echelonlen = [],										//梯队长度
+		allowType = ['jpg', 'png', 'gif'],						//允许加载的图片类型
+		config = {
+			xhr: null,
+			timeOut: opts.loadingOverTime || 15,				//超时时间
+			timeOutCB: opts.loadingOverTimeCB || function(){},	//超时回调
+			id: 0,												//超时标示
+			max: 3												//超时最高次数
+		},
+		head = document.getElementsByTagName("head")[0],
+
+		//img标签预加载
+		imgNode = [],
+		imgNodePSrc = [],
+
+		//audio标签预加载
+		audioNode = [],
+		audioNodePSrc = [];
+
+	var init = function() {
+		_initData(); //初始化资源参数
+		if(connector != null){
+			_getData();
+		}
+
+		_load(echelon[0], echeloncb[0], echelonlen);	//开始请求资源
+
+	};
+
+	var _createXHR = (function() {
+		if (typeof XMLHttpRequest != "undefined") {
+			return new XMLHttpRequest();
+		} else if (typeof ActiveXObject != "undefined") {
+			if (typeof arguments.callee.activeXString != "string") {
+				var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
+						"MSXML2.XMLHttp"
+					],
+					i, len;
+				for (i = 0, len = versions.length; i < len; i++) {
+					try {
+						new ActiveXObject(versions[i]);
+						arguments.callee.activeXString = versions[i];
+						break;
+					} catch (ex) {
+						//跳过
+					}
+				}
+			}
+			return new ActiveXObject(arguments.callee.activeXString);
+		} else {
+			throw new Error("No XHR object available.");
+		}
+	})();
+
+	var _initData = function() {
+		if(sources === null) return; 
+
+		//梯队总数
+		echetotal = Object.getOwnPropertyNames(sources).length;
+
+
+		//处理梯队资源和回调
+		for(var i in sources){
+
+			for(var j = 0, len = sources[i].source.length; j < len; j++){
+				echelon.push(sources[i].source[j]);
+			}
+			echelonlen.push(sources[i].source.length);
+
+
+			echeloncb.push(typeof sources[i].callback == 'undefined' ? null : sources[i].callback);
+		}
+
+
+		//梯队回调标示位置
+		for(var i = 1, len = echelonlen.length; i < len; i++){
+			echelonlen[i] = echelonlen[i - 1] + echelonlen[i];
+		}
+
+		//资源总数
+		total = echelon.length;
+
+		//处理img标签的预加载
+		imgNode = document.getElementsByTagName('img');			//获取img标签节点
+		for(var i = 0, len = imgNode.length; i < len; i++){
+			if(imgNode[i].attributes.pSrc){
+				imgNodePSrc[i] = imgNode[i].attributes.pSrc.value;
+			}
+		}
+
+		audioNode = document.getElementsByTagName('audio');			//获取img标签节点
+		for(var i = 0, len = audioNode.length; i < len; i++){
+			if(audioNode[i].attributes.pSrc){
+				audioNodePSrc[i] = audioNode[i].attributes.pSrc.value;
+			}
+		}
+		// console.log(imgNode);
+		// console.log(imgNodePSrc);
+
+		// console.log(audioNode);
+		// console.log(audioNodePSrc);
+
+	};
+
+	//递归加载单个梯队的资源
+	var _load = function(res, callback, length) {
+		// createTimer(new Date());
+		if(id >= length[flag]){
+			if(echeloncb[flag] != null){
+				echeloncb[flag]();
+			}
+			++flag;
+		}
+
+		if(flag >= echetotal) {
+			completeLoad();
+			return;
+		}
+
+		if(isImg(res)) {
+			var img = new Image();
+			// createTimer(new Date());
+
+			var timer = setTimeout(function () {
+	            config.timeOutCB();
+	        },config.timeOut*1000);
+
+			img.src = res;
+
+			//加载成功后执行
+			img.onload = function () {
+				//加载成功后清理计时器
+				clearTimeout(timer);
+				progress(++completedCount, total);
+
+				for(var i = 0, len = imgNodePSrc.length; i < len; i++){
+					if(imgNodePSrc[i] == res){
+						imgNode[i].src =  imgNodePSrc[i];
+						break;
+					}
+				}
+
+				_load(echelon[++id], callback, length);
+			}
+
+			//加载失败后执行
+			img.onerror = function() {
+				progress(++completedCount, total);
+				_load(echelon[++id], callback, length);
+			}
+		}else{
+
+			config.xhr = _createXHR;
+			
+			config.xhr.onreadystatechange = function() {
+				if (config.xhr.readyState == 4){
+					if((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304){
+
+						progress(++completedCount, total);
+
+						for(var i = 0, len = audioNodePSrc.length; i < len; i++){
+							if(audioNodePSrc[i] == res){
+								audioNode[i].src =  audioNodePSrc[i];
+								break;
+							}
+						}
+
+						_load(echelon[++id], callback, length);
+					}
+				}else if(config.xhr.status >= 400 && config.xhr.status < 500){
+					progress(++completedCount, total);
+					_load(echelon[++id], callback, length);
+				}
+			};
+
+			config.xhr.open("GET", res, true);
+
+			config.xhr.send(null);
+		}
+		
+	};
+
+	//获取接口数据
+	var _getData = function(){
+		for(var i in connector){
+			if(connector[i].jsonp){
+				asynGetData(connector[i].url);
+			}else{
+				syncGetData(connector[i].url, connector[i].callback)
+			}
+		}
+	}
+
+	//判断是否是图片
+	var isImg = function(res) {
+		var type = res.split('.').pop();
+		for (var i = 0, len = allowType.length; i < len; i++) {
+			if (type == allowType[i]) return true;
+		}
+		return false;
+	};
+
+	//同步获取数据
+	var syncGetData = function(url, callback){
+		config.xhr = _createXHR;
+		config.xhr.onreadystatechange = function() {
+			if (config.xhr.readyState == 4) {
+				if ((config.xhr.status >= 200 && config.xhr.status < 300) || config.xhr.status === 304) {
+					callback(config.xhr.responseText)
+				}
+			}
+		}
+
+		config.xhr.open("GET", url, true);
+
+		config.xhr.send(null);
+	}
+
+	//异步获取数据
+	var asynGetData = function(url){
+		var script = document.createElement("script");
+		script.src = url;
+		head.appendChild(script);
+	};
+
+	//创建计时器
+	var createTimer = function(time){
+		setTimeout(function(){
+			console.log((new Date() - time));
+			console.log(config.timeOut);
+			if(new Date() - time < config.timeOut * 1000){
+				setTimeout(arguments.callee, 1000);
+			}else{
+				console.log('超时');
+			}
+		}, 50);
+	};
+
+	init();
+};
+
+
+if (typeof module == 'object') {
+    module.exports = Preload;
+} else {
+    window.Preload = Preload;
+}
