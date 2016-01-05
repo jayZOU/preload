@@ -6,7 +6,7 @@ var Preload = function(opts) {
 	this.opts = {
 		sources: null,											//预加载资源总队列
 		progress: function(){},									//进度条回调
-        connector:  null, //接口数据		
+        connector:  null, 										//接口数据		
 		completeLoad: function(){},								//加载完成回调
 		config: {
 			timeOut: opts.loadingOverTime || 15,				//超时时间
@@ -62,7 +62,7 @@ Preload.prototype = {
 		self._initData();
 
 		//调用接口数据
-		if (opts.connector != null) {
+		if (opts.connector !== null) {
             self._getData();
         }
 
@@ -247,7 +247,10 @@ Preload.prototype = {
 		// self._load(params.echelon[++params.id], callback, length);
 	},
 
-	//获取接口数据
+	/*
+	*	获取后台数据，区分同/异布
+	*
+	*/
     _getData: function() {
 
 		var self = this,
@@ -263,7 +266,13 @@ Preload.prototype = {
         }
     },
 
-    //同步获取数据
+	/*
+	*	同步获取后台数据
+	*	
+	*	@param	url			接口路径 
+	*	@param	callback	成功后回调 
+	*
+	*/
     syncGetData: function(url, callback) {
 		var self = this,
 			opts = self.opts,
@@ -282,7 +291,12 @@ Preload.prototype = {
         params._createXHR.send(null);
     },
 
-    //异步获取数据
+	/*
+	*	跨域获取后台数据
+	*	
+	*	@param	url	接口路径 
+	*
+	*/
     asynGetData: function(url) {
 		var self = this,
 			opts = self.opts,
@@ -292,6 +306,10 @@ Preload.prototype = {
         params.head.appendChild(script);
     },
 
+	/*
+	*	根据平台获取XHR
+	*	
+	*/
 	getXHR: function(){
 		if (typeof XMLHttpRequest != "undefined") {
 			return new XMLHttpRequest();
@@ -317,6 +335,12 @@ Preload.prototype = {
 		}
 	},
 
+	/*
+	*	判断传入是否是图片，根据后缀名和allowType校验是否符合要求
+	*	
+	*	@param	res	图片资源路径 
+	*
+	*/
 	isImg: function(res) {
 		var self = this,
 			opts = self.opts,
