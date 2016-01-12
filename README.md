@@ -5,6 +5,7 @@
  - 支持同步或异步获取数据
  - 进度条，可以动态获取进度条信息
  - 支持img标签的预加载，添加pSrc属性即可
+ - [ES6](https://github.com/jayZOU/preload/tree/dev)
 
 
 ##Install
