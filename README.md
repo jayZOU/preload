@@ -48,6 +48,7 @@
     *   @time 2016-2-16
     *   @version 2.1.2
     *   @class Preload
+    *   @param {boolean} isDebug            选填  是否开启debug选项，用于移动端调试，默认false
     *   @param {object} sources             必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
     *   @param int      loadingOverTime     选填  预加载超时时间，默认15， 单位:秒
     *   @param {object} loadingOverTimeCB   选填  预加载超时回调
@@ -110,6 +111,7 @@
     *   @time 2016-2-17
     *   @version 2.1.3
     *   @class Preload
+    *   @param {boolean} isDebug              选填  是否开启debug选项，用于移动端调试，默认false
     *   @param {object} connector             必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
     **/
 
