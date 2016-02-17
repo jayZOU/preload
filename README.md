@@ -107,23 +107,32 @@
 	/**
     *   Preload connectorLoad
     *   @author jayzou
-    *   @time 2016-2-16
-    *   @version 2.1.2
+    *   @time 2016-2-17
+    *   @version 2.1.3
     *   @class Preload
     *   @param {object} connector             必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
     **/
 
 var connectorLoad = new Preload.connectorLoad({	//可单独使用connectorLoad，var connectorLoad = new connectorLoad()
+    isDebug: true,
     connector: {
         int1: {
-            url: 'http://localhost/tcc/index.php?callback=read&city=上海市',
-            jsonp: true
+            url: 'http://localhost/test1/index.php?callback=read&city=上海市',
+            jsonp: true,
+            loadingOverTime: 3,
+            loadingOverTimeCB: function() {
+                console.log("资源加载超时");
+            },
         },
         int2: {
-            url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
+            url: 'http://localhost/test1/index.php?callback=read&city=深圳市',
             jsonp: false,
-            callback: function(res) {
+            loadingOverTime: 3,
+            success: function(res) {
                 console.log(res);
+            },
+            error: function(err) {
+                console.log(err);
             }
         }
     }

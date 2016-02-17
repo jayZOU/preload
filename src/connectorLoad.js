@@ -5,7 +5,6 @@ var connectorLoad = function(opts) {
 	//可修改参数
 	this.opts = {
     	isDebug: false,
-		sources: null,											//预加载资源总队列
         connector:  null, 										//接口数据		
 		completeLoad: function(){},								//加载完成回调
 
@@ -39,9 +38,6 @@ connectorLoad.prototype = {
 		params._createXHR = self.getXHR();
 
 
-		//初始化资源参数
-		// self._initData();
-
 		//调用接口数据
         self._getData();
 
@@ -60,10 +56,12 @@ connectorLoad.prototype = {
 			params = self.params;
 
         for (var i in opts.connector) {
-            if (opts.connector[i].jsonp) {
-                self.asynGetData(opts.connector[i].url);
+        	if(!opts.connector[i].url) self.throwIf(i + "队列URL不存在");
+
+            if (opts.connector[i].jsonp || false) {
+                self.asynGetData(opts.connector[i]);
             } else {
-                self.syncGetData(opts.connector[i].url, opts.connector[i].callback)
+                self.syncGetData(opts.connector[i]);
             }
         }
     },
@@ -75,15 +73,22 @@ connectorLoad.prototype = {
 	*	@param	callback	成功后回调 
 	*
 	*/
-    syncGetData: function(url, callback) {
+    syncGetData: function(connect) {
 		var self = this,
-			opts = self.opts,
-			params = self.params;
-        // config.xhr = _createXHR;
+			params = this.params,
+			url = connect.url || "",
+			loadingOverTime = connect.loadingOverTime || 12,
+			success = connect.success || function(){},
+			error = connect.error || function(){};
+
+
         params._createXHR.onreadystatechange = function() {
             if (params._createXHR.readyState == 4) {
                 if ((params._createXHR.status >= 200 && params._createXHR.status < 300) || params._createXHR.status === 304) {
-                    callback(params._createXHR.responseText)
+                    success(params._createXHR.responseText)
+                }else{
+                	self.throwIf("对" + url + "请求失败，状态码为：" + params._createXHR.status);
+                	error(params._createXHR);
                 }
             }
         }
@@ -99,13 +104,25 @@ connectorLoad.prototype = {
 	*	@param	url	接口路径 
 	*
 	*/
-    asynGetData: function(url) {
+    asynGetData: function(connect) {
 		var self = this,
-			opts = self.opts,
-			params = self.params;
+			params = this.params,
+			url = connect.url || "",
+			loadingOverTime = connect.loadingOverTime || 12,
+			loadingOverTimeCB = connect.loadingOverTimeCB || function(){};
+
+		var timeOut = self.getTimeOut(loadingOverTime, loadingOverTimeCB);
+
         var script = document.createElement("script");
         script.src = url;
         params.head.appendChild(script);
+        
+        script.onload = function(){
+        	// alert(1);
+        	clearTimeout(timeOut);
+        	params.head.removeChild(script);
+        }
+
     },
 
     /*
@@ -113,29 +130,26 @@ connectorLoad.prototype = {
 	*	
 	*/
 	getXHR: function(){
-		if (typeof XMLHttpRequest != "undefined") {
-			return new XMLHttpRequest();
-		} else if (typeof ActiveXObject != "undefined") {
-			if (typeof arguments.callee.activeXString != "string") {
-				var versions = ["MSXML2.XMLHttp.6.0", "MSXML2.XMLHttp.3.0",
-						"MSXML2.XMLHttp"
-					],
-					i, len;
-				for (i = 0, len = versions.length; i < len; i++) {
-					try {
-						new ActiveXObject(versions[i]);
-						arguments.callee.activeXString = versions[i];
-						break;
-					} catch (ex) {
-						//跳过
-					}
-				}
-			}
-			return new ActiveXObject(arguments.callee.activeXString);
-		} else {
-			throw new Error("No XHR object available.");
-		}
+		if (typeof XMLHttpRequest != "undefined") return new XMLHttpRequest();
+		
+		throwIf("unSupport: IE9以下")
 	},
+
+	getTimeOut: function(time, callback) {
+		return setTimeout(function(){
+			callback();
+		}, time * 1000);
+	},
+
+	//错误数据弹出
+	throwIf: function(msg) {
+		var opts = this.opts,
+			msg = msg || "未知错误";
+		if(opts.isDebug){
+			alert(msg);
+			return;
+		}
+	}
 }
 
 if (typeof module == 'object') {
