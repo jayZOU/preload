@@ -209,16 +209,14 @@ imageLoad.prototype = {
 	},
 
 	//错误数据弹出
-	throwIf: function(msg) {
-		var self = this,
-			opts = self.opts,
-			params = self.params,
-		msg = msg || "未知错误";
-		if(opts.isDebug){
-			alert(msg);
-			return;
-		}
-	}
+    throwIf: function(msg) {
+        var opts = this.opts,
+            msg = msg || "未知错误";
+        if(opts.isDebug){
+            alert(msg);
+            return;
+        }
+    }
 }
 
 if (typeof module == 'object') {
