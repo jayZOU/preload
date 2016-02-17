@@ -1,17 +1,16 @@
 {
   "name": "preload",
-  "version": "1.0.2",
+  "version": "2.1.2",
   "description": "a preload component",
-  "main": "gulpfile.js",
+  "main": "preload.js",
   "dependencies": {
-    "gulp": "^3.9.0",
-    "gulp-connect": "^2.2.0",
-    "gulp-uglify": "^1.5.1",
-    "watchify": "^3.6.1"
+    "webpack": "^1.12.4",
+    "webpack-dev-server": "^1.12.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack",
+    "dev": "webpack-dev-server --devtool eval --progress --colors --content-base demo"
   },
   "repository": {
     "type": "git",

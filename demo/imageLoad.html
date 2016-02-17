@@ -2,19 +2,13 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>preload</title>
+	<title>imageLoad</title>
 	<style>
-		.a{
-			background: url('./image/b1.jpg');
-			width: 200px;
-			height: 200px;
-		}
 
 	</style>
 </head>
 <body>
 
-	
 	
 	<audio pSrc="./audio/a.mp3" preload="auto" controls></audio>
 	<audio pSrc="./audio/b.mp3" preload="auto" controls></audio>
@@ -25,27 +19,12 @@
 	<img pSrc="./image/b4.jpg" alt="">
 
 
-	<!--
-	<script src="./js/preload.js"></script>
-	-->
+	
 	<script src="./preload.js"></script>
+	
 	<script>
-
-	/**
-	*	Preload 资源预加载组件
-	*	@author jayzou
-	*	@time 2015-12-7
-	*	@version 1.0.3
-	*	@class Preload
-	*	@param {object}	sources				必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
-	*   @param {object} connector   		选填  后台数据接口，可选择同步或异步
-	*   @param int 		loadingOverTime  	选填  预加载超时时间，默认15， 单位:秒
-	*   @param {object} loadingOverTimeCB   选填  预加载超时回调
-	*	@param {object}	wrap				选填	进度条容器，返回记载进度信息
-	*	@param {object}	completeLoad		选填	完成所有加载项执行回调，包括同、异步获取数据
-	**/
-
-		var preload = new Preload({
+		var imageLoad = new Preload.imageLoad({
+			isDebug: false,
 	        sources: {
 	            imgs:{
 	                source:[
@@ -60,7 +39,10 @@
 	                source:[
 	                    "./audio/a.mp3",
 	                    "./audio/b.mp3"
-	                ]
+	                ],
+	                callback: function(){
+	                    console.log("队列2完成");
+	                }
 	            },
 	            imgs2:{
 	                source:[
@@ -78,19 +60,6 @@
 	        loadingOverTimeCB: function(){
 	            console.log("资源加载超时");
 	        },
-	        connector: {
-	            int1: {
-	                url: 'http://localhost/tcc/index.php?callback=read&city=上海市',
-	                jsonp: true
-	            },
-	            int2: {
-	                url: 'http://localhost/tcc/index.php?callback=read&city=深圳市',
-	                jsonp: false,
-	                callback: function(data){
-	                	console.log(data);
-	                }
-	            }
-	        },
 	        progress: function(completedCount, total){
 	            console.log(Math.floor((completedCount / total) * 100));
 	        },
@@ -98,11 +67,6 @@
 	            console.log("已完成所有加载项");
 	        }
 	    });
-
-		function read(){
-			console.log(arguments[0])
-		}
-
 	</script>
 
 </body>
