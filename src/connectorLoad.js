@@ -107,7 +107,11 @@ connectorLoad.prototype = {
 
         // console.log("type", type);
 
-        params._createXHR.open(type, type == 'POST' ? url : url + '?' + self.getQueryString(data), connect.async || true);
+        url = type == 'POST' ? url : url + '?' + self.getQueryString(data)
+
+        // console.log(url);
+
+        params._createXHR.open(type, url, connect.async || true);
 
         params._createXHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
@@ -128,8 +132,11 @@ connectorLoad.prototype = {
 			url = connect.url || "",
 			loadingOverTime = connect.loadingOverTime || 12,
 			loadingOverTimeCB = connect.loadingOverTimeCB || function(){};
-		
+
 		var timeOut = self.getTimeOut(loadingOverTime, loadingOverTimeCB);
+
+		url += (/\?/.test(url) ? "&" : "?") + '_=' +  Date.parse(new Date());
+		// console.log(url + (/\?/.test(url) ? "&" : "?") + '_=' +  Date.parse(new Date()));
 
         var script = document.createElement("script");
         script.src = url;

@@ -35,7 +35,7 @@
 			        },
 			        async: true,						//选填，同步或异步，默认true，异步
 	                success: function(res){				//必填，执行成功后的回调
-	                    alert(res);
+	                    console.log(res);
 	                },
 	                error: function(err){				//选填，执行失败后的回调
 	                	console.log(err);
@@ -48,7 +48,7 @@
 	    });
 
 		function read(){
-			alert('这是跨域' + arguments[0])
+			console.log(arguments[0])
 		}
 	</script>
 
