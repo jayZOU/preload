@@ -3,9 +3,9 @@
 
 一共分为3个模块，可单独使用，支持CMD
 
- - [imageLoad](https://github.com/jayZOU/preload/blob/master/src/js/imageLoad.js)
- - [connectorLoad](https://github.com/jayZOU/preload/blob/master/src/js/connectorLoad.js)
- - [cssLoad](https://github.com/jayZOU/preload/blob/master/src/js/cssLoad.js)
+ - [imageLoad](https://github.com/jayZOU/preload/blob/master/src/imageLoad.js)
+ - [connectorLoad](https://github.com/jayZOU/preload/blob/master/src/connectorLoad.js)
+ - [cssLoad](https://github.com/jayZOU/preload/blob/master/src/cssLoad.js)
 
 具备以下特性
 
