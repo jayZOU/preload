@@ -14,6 +14,9 @@ var connectorLoad = function(opts) {
 	this.params = {
 		_createXHR: null,										//Ajax初始化
 
+		id: 0,													//自增ID
+		count: 0,												//队列总数
+
         head: document.getElementsByTagName("head")[0],			//异步调用接口数据
 	}
 
@@ -37,6 +40,7 @@ connectorLoad.prototype = {
 		//Ajax初始化
 		params._createXHR = self.getXHR();
 
+		params.count = Object.getOwnPropertyNames(opts.connector).length;
 
 		//调用接口数据
         self._getData();
@@ -44,6 +48,7 @@ connectorLoad.prototype = {
 		//开始预加载资源
 		// self._load(params.echelon[0], params.echeloncb[0], params.echelonlen);			
 	},
+
 
 	/*
 	*	获取后台数据，区分同/异布
@@ -77,25 +82,38 @@ connectorLoad.prototype = {
 		var self = this,
 			params = this.params,
 			url = connect.url || "",
-			loadingOverTime = connect.loadingOverTime || 12,
-			success = connect.success || function(){},
-			error = connect.error || function(){};
+			type = connect.type.toLocaleUpperCase(),
+			data = connect.data || {};
 
+
+
+		var timeOut = self.getTimeOut(connect.loadingOverTime, connect.loadingOverTimeCB);
+
+		if(type !== 'GET' && type !== 'POST') type = 'GET';
 
         params._createXHR.onreadystatechange = function() {
             if (params._createXHR.readyState == 4) {
+            	clearTimeout(timeOut);
                 if ((params._createXHR.status >= 200 && params._createXHR.status < 300) || params._createXHR.status === 304) {
-                    success(params._createXHR.responseText)
+                    connect.success(params._createXHR.responseText)
                 }else{
                 	self.throwIf("对" + url + "请求失败，状态码为：" + params._createXHR.status);
-                	error(params._createXHR);
+                	connect.error(params._createXHR);
                 }
+
+            	self.isCompleteAllLoad();
             }
         }
 
-        params._createXHR.open("GET", url, true);
+        // console.log("type", type);
 
-        params._createXHR.send(null);
+        params._createXHR.open(type, type == 'POST' ? url : url + '?' + self.getQueryString(data), connect.async || true);
+
+        params._createXHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        // console.log(self.getQueryString(connect.data));
+
+        params._createXHR.send(type == 'POST' ? self.getQueryString(data) : null);
     },
 
 	/*
@@ -110,7 +128,7 @@ connectorLoad.prototype = {
 			url = connect.url || "",
 			loadingOverTime = connect.loadingOverTime || 12,
 			loadingOverTimeCB = connect.loadingOverTimeCB || function(){};
-
+		
 		var timeOut = self.getTimeOut(loadingOverTime, loadingOverTimeCB);
 
         var script = document.createElement("script");
@@ -121,6 +139,7 @@ connectorLoad.prototype = {
         	// alert(1);
         	clearTimeout(timeOut);
         	params.head.removeChild(script);
+            self.isCompleteAllLoad();
         }
 
     },
@@ -132,7 +151,7 @@ connectorLoad.prototype = {
 	getXHR: function(){
 		if (typeof XMLHttpRequest != "undefined") return new XMLHttpRequest();
 		
-		throwIf("unSupport: IE9以下")
+		throwIf("only Support IE9+")
 	},
 
 	getTimeOut: function(time, callback) {
@@ -149,7 +168,24 @@ connectorLoad.prototype = {
 			alert(msg);
 			return;
 		}
-	}
+	},
+
+	getQueryString: function(object) {
+      return Object.keys( object ).map( function( item ) {
+        return encodeURIComponent( item )
+          + '=' + encodeURIComponent( object[ item ] );
+      }).join( '&' );
+    },
+
+    isCompleteAllLoad: function() {
+    	var self = this,
+			opts = self.opts,
+			params = self.params;
+
+    	if(++params.id >= params.count){
+    		opts.completeLoad();
+    	}
+    }
 }
 
 if (typeof module == 'object') {

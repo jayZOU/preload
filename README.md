@@ -108,18 +108,19 @@
 	/**
     *   Preload connectorLoad
     *   @author jayzou
-    *   @time 2016-2-17
-    *   @version 2.1.3
+    *   @time 2016-2-18
+    *   @version 2.1.4
     *   @class Preload
     *   @param {boolean} isDebug              选填  是否开启debug选项，用于移动端调试，默认false
     *   @param {object} connector             必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
+    *   @param {object} completeLoad            选填  完成所有加载项执行回调
     **/
 
-var connectorLoad = new Preload.connectorLoad({	//可单独使用connectorLoad，var connectorLoad = new connectorLoad()
+var connectorLoad = new Preload.connectorLoad({
     isDebug: true,
     connector: {
         int1: {
-            url: 'http://localhost/test1/index.php?callback=read&city=上海市',
+            url: 'http://192.168.191.1/test1/index.php?callback=read&city=上海市',
             jsonp: true,
             loadingOverTime: 3,
             loadingOverTimeCB: function() {
@@ -127,21 +128,33 @@ var connectorLoad = new Preload.connectorLoad({	//可单独使用connectorLoad�
             },
         },
         int2: {
-            url: 'http://localhost/test1/index.php?callback=read&city=深圳市',
-            jsonp: false,
-            loadingOverTime: 3,
-            success: function(res) {
+            url: 'http://192.168.191.1/test1/index.php',
+            type: 'GET',                        //选填，请求类型，GET or POST 默认GET
+            jsonp: false,                       //选填，是否为jsonp，默认false
+            data: {                             //选填，发送服务器数据
+                "callback": "read",
+                "city": "深圳市"
+            },
+            loadingOverTime: 3,                 //选填，超时时间，默认12S
+            loadingOverTimeCB: function() {     //选填，超时回调，
+                console.log("资源加载超时");
+            },
+            async: true,                        //选填，同步或异步，默认true，异步
+            success: function(res) {            //必填，执行成功后的回调
                 console.log(res);
             },
-            error: function(err) {
+            error: function(err) {              //选填，执行失败后的回调
                 console.log(err);
             }
         }
+    },
+    completeLoad: function() {                  //选填，完成所有队列后执行，无论成功或失败
+        console.log("已完成所有加载项");
     }
 });
 
 function read() {
-    console.log(arguments[0])
+    console.log('这是跨域' + arguments[0])
 }
 ```
 
