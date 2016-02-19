@@ -6,8 +6,8 @@
 </head>
 <body>
 
-	<h1 class="index">index.css样式表插入</h1>
-	<h1 class="main">main.css样式表插入</h1>
+	<h1 class="index" id="index">index.css样式表插入</h1>
+	<h1 class="main" id="main">main.css样式表插入</h1>
 	
 
 
@@ -15,27 +15,8 @@
 	<script src="./preload.js"></script>
 	
 	<script>
-		var cssLoad = new Preload.cssLoad({
-			isDebug: true,								//选填，是否开启debug
-			sources: {
-				index: {
-					href: "./style/index.css",			//必填，资源路径
-					tag: "head",						//选填，link标签位置，head  or  body
-					media: "all",
-					callback: function(){				//选填，加载完成后回调
-						alert(1);
-					}
-				},
-				main: {
-					href: "./style/main.css",			//必填，资源路径
-					tag: "body",						//选填，link标签位置，head  or  body
-					media: "all",
-					callback: function(){				//选填，加载完成后回调
-						alert(2);
-					}
-				}
-			}
-		})
+		Preload.cssLoad('./style/index.css', document.getElementById("index"), "media");
+		Preload.cssLoad('./style/main.css', document.getElementById("main"), "media");
 	</script>
 
 </body>

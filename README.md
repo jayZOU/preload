@@ -159,37 +159,30 @@ function read() {
 ```
 
 ###cssLoad
+```html
+    <h1 class="index" id="index">index.css样式表插入</h1>
+    <h1 class="main" id="main">main.css样式表插入</h1>
+```
 ```js
 	/**
     *   Preload cssLoad
     *   @author jayzou
-    *   @time 2016-2-16
-    *   @version 2.1.2
+    *   @time 2016-2-19
+    *   @version 2.1.3
     *   @class Preload
-    *   @param {object} sources             必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
+    *   @param {string} url         必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
+    *   @param {Object} local       选填  CSS加载的位置，默认head末尾添加
+    *   @param {string} media       选填  CSS media
     **/
 
-var cssLoad = new Preload.cssLoad({				//可单独使用cssLoad，var cssLoad = new cssLoad()
-    isDebug: true, //选填，是否开启debug
-    sources: {
-        index: {
-            href: "./style/index.css", //必填，资源路径
-            tag: "head", //选填，link标签位置，head  or  body
-            media: "all",
-            callback: function() { //选填，加载完成后回调
-                alert(1);
-            }
-        },
-        main: {
-            href: "./style/main.css", //必填，资源路径
-            tag: "body", //选填，link标签位置，head  or  body
-            media: "all",
-            callback: function() { //选填，加载完成后回调
-                alert(2);
-            }
-        }
-    }
-})
+    Preload.cssLoad('./style/index.css', document.getElementById("index"), "media");
+    Preload.cssLoad('./style/main.css', document.getElementById("main"), "media");
+
+    /**
+    *   可以选择单独加载cssLoad.js
+    *   cssLoad('./style/index.css', document.getElementById("index"), "media");
+    *   cssLoad('./style/main.css', document.getElementById("main"), "media");
+    **/
 ```
 
 ##Notes
