@@ -175,13 +175,13 @@ function read() {
     *   @param {string} media       选填  CSS media
     **/
 
-    Preload.cssLoad('./style/index.css', document.getElementById("index"), "media");
-    Preload.cssLoad('./style/main.css', document.getElementById("main"), "media");
+    Preload.cssLoad('./style/index.css', document.getElementById("index"), "all");
+    Preload.cssLoad('./style/main.css', document.getElementById("main"), "all");
 
     /**
     *   可以选择单独加载cssLoad.js
-    *   cssLoad('./style/index.css', document.getElementById("index"), "media");
-    *   cssLoad('./style/main.css', document.getElementById("main"), "media");
+    *   cssLoad('./style/index.css', document.getElementById("index"), "all");
+    *   cssLoad('./style/main.css', document.getElementById("main"), "all");
     **/
 ```
 
