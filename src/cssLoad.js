@@ -21,7 +21,9 @@ var cssLoad = function(url, local, media) {
         media = media || "all";
     link.rel = "stylesheet";
     link.href = url;
-    link.media = "only x";
+    link.media = media;
+
+    // console.log(navigator.userAgent.toLowerCase().match(/firefox/));
 
     if(!local){
         var loa = ( doc.getElementsByTagName( "head" )[ 0 ] || doc.body ).childNodes;
@@ -32,8 +34,11 @@ var cssLoad = function(url, local, media) {
         local.parentNode.insertBefore(link, local ? local : local.nextSibling)
     })
 
-    link.addEventListener && link.addEventListener("load", function() {
-        this.media = media
+    link.addEventListener && link.addEventListener("load", function(e) {
+        if(navigator.userAgent.toLowerCase().match(/firefox/)){
+            var script = doc.createElement("script");
+            local.parentNode.insertBefore(script, local ? local : local.nextSibling);
+        }
     });
 
     link.onloadcssdefined = onloadcssdefined;

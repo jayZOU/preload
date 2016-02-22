@@ -167,8 +167,8 @@ function read() {
 	/**
     *   Preload cssLoad
     *   @author jayzou
-    *   @time 2016-2-19
-    *   @version 2.1.3
+    *   @time 2016-2-22
+    *   @version 2.1.4
     *   @class Preload
     *   @param {string} url         必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
     *   @param {Object} local       选填  CSS加载的位置，默认head末尾添加
