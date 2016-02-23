@@ -9,10 +9,6 @@
 </head>
 <body>
 
-	
-	<audio pSrc="./audio/a.mp3" preload="auto" controls></audio>
-	<audio pSrc="./audio/b.mp3" preload="auto" controls></audio>
-
 	<img pSrc="./image/b1.jpg" alt="">
 	<img pSrc="./image/b2.jpg" alt="">
 	<img pSrc="./image/b3.jpg" alt="">
@@ -24,7 +20,7 @@
 	
 	<script>
 		var imageLoad = new Preload.imageLoad({
-			isDebug: false,
+			isDebug: true,
 	        sources: {
 	            imgs:{
 	                source:[
@@ -33,15 +29,6 @@
 	                ],
 	                callback: function(){
 	                    console.log("队列1完成");
-	                }
-	            },
-	            audio:{
-	                source:[
-	                    "./audio/a.mp3",
-	                    "./audio/b.mp3"
-	                ],
-	                callback: function(){
-	                    console.log("队列2完成");
 	                }
 	            },
 	            imgs2:{
