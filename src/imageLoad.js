@@ -53,10 +53,10 @@ imageLoad.prototype = {
         //初始化资源参数
         self._initData();
 
-        console.log(params.echelon);
-        console.log(params.echeloncb);
-        console.log(params.echelonlen);
-        console.log(params.total);
+        // console.log(params.echelon);
+        // console.log(params.echeloncb);
+        // console.log(params.echelonlen);
+        // console.log(params.total);
 
         //开始加载队列资源
         self.loadEcho(params.echelon[0])
@@ -91,6 +91,14 @@ imageLoad.prototype = {
         //梯队回调标示位置
         for (var i = 1, len = params.echelonlen.length; i < len; i++) {
             params.echelonlen[i] = params.echelonlen[i - 1] + params.echelonlen[i];
+        }
+
+        //处理img标签的预加载
+        params.imgNode = document.getElementsByTagName('img');          //获取img标签节点
+        for(var i = 0, len = params.imgNode.length; i < len; i++){
+            if(params.imgNode[i].attributes.pSrc){
+                params.imgNodePSrc[i] = params.imgNode[i].attributes.pSrc.value;
+            }
         }
 
         // params.total = params.echelon.length;
@@ -138,15 +146,20 @@ imageLoad.prototype = {
                 //加载成功后清理计时器
                 clearTimeout(timer);
                 opts.progress(++params.completedCount, params.total);
-                self.next();
+                        
+                // console.log("imgNodePSrc", params.imgNodePSrc);
 
                 //预加载标签替换
                 for (var i = 0, len = params.imgNodePSrc.length; i < len; i++) {
+
                     if (params.imgNodePSrc[i] == res) {
                         params.imgNode[i].src = params.imgNodePSrc[i];
                         break;
                     }
                 }
+
+
+                self.next();
 
             }
 
