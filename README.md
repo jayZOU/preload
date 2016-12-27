@@ -35,13 +35,13 @@
 如果img标签需要进行预加载，按以下格式
 ```html
     <img pSrc="./src/image/b1.jpg" alt="">
-	<img pSrc="./src/image/b2.jpg" alt="">
-	<img pSrc="./src/image/b3.jpg" alt="">
-	<img pSrc="./src/image/b4.jpg" alt="">
+    <img pSrc="./src/image/b2.jpg" alt="">
+    <img pSrc="./src/image/b3.jpg" alt="">
+    <img pSrc="./src/image/b4.jpg" alt="">
 ```
 ```js
 
-	/**
+    /**
     *   Preload imageLoad
     *   @author jayzou
     *   @time 2016-2-23
@@ -55,56 +55,56 @@
     *   @param {object} completeLoad        选填  完成所有加载项执行回调
     **/
 
-    var imageLoad = new Preload.imageLoad({	//可单独使用imageLoad，var imageLoad = new imageLoad()
-	    isDebug: false,
-	    sources: {
-	        imgs: {
-	            source: [
-	                "./image/b2.jpg",
-	                "./image/b1.jpg"
-	            ],
-	            callback: function() {
-	                console.log("队列1完成");
-	            }
-	        },
-	        audio: {
-	            source: [
-	                "./audio/a.mp3",
-	                "./audio/b.mp3"
-	            ],
-	            callback: function() {
-	                console.log("队列2完成");
-	            }
-	        },
-	        imgs2: {
-	            source: [
-	                "./image/b3.jpg",
-	                "./image/b4.jpg",
-	                "http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
-	                "http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
-	            ],
-	            callback: function() {
-	                console.log("队列3完成");
-	            }
-	        }
-	    },
-	    loadingOverTime: 3,
-	    loadingOverTimeCB: function() {
-	        console.log("资源加载超时");
-	    },
-	    progress: function(completedCount, total) {
-	        console.log(Math.floor((completedCount / total) * 100));
-	    },
-	    completeLoad: function() {
-	        console.log("已完成所有加载项");
-	    }
-	});
+    var imageLoad = new Preload.imageLoad({ //可单独使用imageLoad，var imageLoad = new imageLoad()
+        isDebug: false,
+        sources: {
+            imgs: {
+                source: [
+                    "./image/b2.jpg",
+                    "./image/b1.jpg"
+                ],
+                callback: function() {
+                    console.log("队列1完成");
+                }
+            },
+            audio: {
+                source: [
+                    "./audio/a.mp3",
+                    "./audio/b.mp3"
+                ],
+                callback: function() {
+                    console.log("队列2完成");
+                }
+            },
+            imgs2: {
+                source: [
+                    "./image/b3.jpg",
+                    "./image/b4.jpg",
+                    "http://7xl041.com1.z0.glb.clouddn.com/OrthographicCamera.png",
+                    "http://7xl041.com1.z0.glb.clouddn.com/audio.gif",
+                ],
+                callback: function() {
+                    console.log("队列3完成");
+                }
+            }
+        },
+        loadingOverTime: 3,
+        loadingOverTimeCB: function() {
+            console.log("资源加载超时");
+        },
+        progress: function(completedCount, total) {
+            console.log(Math.floor((completedCount / total) * 100));
+        },
+        completeLoad: function() {
+            console.log("已完成所有加载项");
+        }
+    });
 ```
 
 ###connectorLoad
 ```js
 
-	/**
+    /**
     *   Preload connectorLoad
     *   @author jayzou
     *   @time 2016-2-18
@@ -163,13 +163,13 @@ function read() {
     <h1 class="main" id="main">main.css样式表插入</h1>
 ```
 ```js
-	/**
+    /**
     *   Preload cssLoad
     *   @author jayzou
     *   @time 2016-2-22
     *   @version 2.1.4
     *   @class Preload
-    *   @param {string} url         必填  加载队列容器，支持队列加载以及加载一个队列后传入回调
+    *   @param {string} url         必填  资源路径
     *   @param {Object} local       选填  CSS加载的位置，默认head末尾添加
     *   @param {string} media       选填  CSS media
     **/
@@ -184,13 +184,53 @@ function read() {
     **/
 ```
 
+###fontLoad
+字体的加载跟图片、CSS加载不一样，字体是声明时不加载，只有使用的时候才会去加载相应的字体，所以使用script标签或者AJAX方式加载资源无效，浏览器不认可这类资源，这里使用link标签`<link rel="preload" as="font" />`告诉预加载器[Preloader](http://calendar.perfplanet.com/2013/big-bad-preloader/)，但是兼容性比较差，具体看[这里](http://caniuse.com/#search=preload)
+
+```css
+    @font-face {
+          font-family: 'Oswald';
+          src: local('Oswald Regular'), local('Oswald-Regular'), url(https://fonts.gstatic.com/s/oswald/v11/Qw6_9HvXRQGg5mMbFR3Phn-_kf6ByYO6CLYdB4HQE-Y.woff2) format('woff2');
+          unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+        }
+        /* latin */
+        @font-face {
+          font-family: 'Oswald';
+          src: local('Oswald Regular'), local('Oswald-Regular'), url(https://fonts.gstatic.com/s/oswald/v11/_P8jt3Y65hJ9c4AzRE0V1OvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
+          unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+        }
+        .text1{
+            font-family: 'Oswald', sans-serif;
+        }
+```
+```js
+    /**
+    *   Preload fontLoad
+    *   @author jayzou
+    *   @time 2016-12-27
+    *   @version 0.0.4
+    *   @class Preload
+    *   @param {string} url         必填  资源地址
+    *   @param {string} as          选填  资源类型
+    *   @param {string} type        选填  保证浏览器只获取自己支持的资源类型
+    *   @param {object} callback    选填  加载完成后回调
+    **/
+
+        Preload.fontLoad('https://fonts.gstatic.com/s/oswald/v11/_P8jt3Y65hJ9c4AzRE0V1OvvDin1pK8aKteLpeZ5c0A.woff2');
+
+    /**
+    *   可以选择单独加载fontLoad.js
+    *   Preload.fontLoad('https://fonts.gstatic.com/s/oswald/v11/_P8jt3Y65hJ9c4AzRE0V1OvvDin1pK8aKteLpeZ5c0A.woff2');
+    **/
+```
+
 ##Notes
 
  - 队列名称不能重名，否则后面的队列会覆盖前面
  - 对于img、audio标签资源预加载，使用pSrc属性
 
-	
-	
+    
+    
 
 
   [1]: http://jayzou.coding.io/
