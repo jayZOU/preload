@@ -1,1 +1,600 @@
-!function(e){function t(n){if(o[n])return o[n].exports;var r=o[n]={exports:{},id:n,loaded:!1};return e[n].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var o={};return t.m=e,t.c=o,t.p="",t(0)}([function(e,t,o){var n=o(1),r=o(3),a=o(2),i={};i.connectorLoad=n,i.imageLoad=r,i.cssLoad=a,window.Preload=i},function(e,t,o){var n=function(e){"use strict";this.opts={isDebug:!1,connector:null,completeLoad:function(){}},this.params={_createXHR:null,id:0,count:0,head:document.getElementsByTagName("head")[0]};for(var t in e)this.opts[t]=e[t];this._init()};n.prototype={_init:function(){var e=this,t=e.opts,o=e.params;null!=t.connector&&(o._createXHR=e.getXHR(),o.count=Object.getOwnPropertyNames(t.connector).length,e._getData())},_getData:function(){var e=this,t=e.opts;e.params;for(var o in t.connector)t.connector[o].url||e.throwIf(o+"队列URL不存在"),t.connector[o].jsonp?e.asynGetData(t.connector[o]):e.syncGetData(t.connector[o])},syncGetData:function(e){var t=this,o=this.params,n=e.url||"",r=e.type.toLocaleUpperCase(),a=e.data||{},i=t.getTimeOut(e.loadingOverTime,e.loadingOverTimeCB);"GET"!==r&&"POST"!==r&&(r="GET"),o._createXHR.onreadystatechange=function(){4==o._createXHR.readyState&&(clearTimeout(i),o._createXHR.status>=200&&o._createXHR.status<300||304===o._createXHR.status?e.success(o._createXHR.responseText):(t.throwIf("对"+n+"请求失败，状态码为："+o._createXHR.status),e.error(o._createXHR)),t.isCompleteAllLoad())},n="POST"==r?n:n+"?"+t.getQueryString(a),o._createXHR.open(r,n,e.async||!0),o._createXHR.setRequestHeader("Content-Type","application/x-www-form-urlencoded"),o._createXHR.send("POST"==r?t.getQueryString(a):null)},asynGetData:function(e){var t=this,o=this.params,n=e.url||"",r=e.loadingOverTime||12,a=e.loadingOverTimeCB||function(){},i=t.getTimeOut(r,a);n+=(/\?/.test(n)?"&":"?")+"_="+Date.parse(new Date);var c=document.createElement("script");c.src=n,o.head.appendChild(c),c.onload=function(){clearTimeout(i),o.head.removeChild(c),t.isCompleteAllLoad()}},getXHR:function(){return"undefined"!=typeof XMLHttpRequest?new XMLHttpRequest:void throwIf("only Support IE9+")},getTimeOut:function(e,t){return setTimeout(function(){t()},1e3*e)},throwIf:function(e){var t=this.opts,e=e||"未知错误";return t.isDebug?void alert(e):void 0},getQueryString:function(e){return Object.keys(e).map(function(t){return encodeURIComponent(t)+"="+encodeURIComponent(e[t])}).join("&")},isCompleteAllLoad:function(){var e=this,t=e.opts,o=e.params;++o.id>=o.count&&t.completeLoad()}},e.exports=n},function(e,t,o){"use strict";var n=function(e,t,o){function n(e){return a.body?e():setTimeout(function(){n(e)})}var r=function(e){for(var t=c.href,o=i.length;o--;)if(i[o].href===t)return e();setTimeout(function(){r(e)})},a=window.document,i=a.styleSheets,c=a.createElement("link"),o=o||"all";if(c.rel="stylesheet",c.href=e,c.media=o,!t){var s=(a.getElementsByTagName("head")[0]||a.body).childNodes;t=s[s.length-1]}n(function(){t.parentNode.insertBefore(c,t?t:t.nextSibling)}),c.addEventListener&&c.addEventListener("load",function(e){if(navigator.userAgent.toLowerCase().match(/firefox/)){var o=a.createElement("script");t.parentNode.insertBefore(o,t?t:t.nextSibling)}}),c.onloadcssdefined=r,r(function(){c.media!==o&&(c.media=o)})};e.exports=n},function(e,t,o){"use strict";var n=function(e){this.opts={isDebug:!1,sources:null,progress:function(){},completeLoad:function(){},config:{timeOut:e.loadingOverTime||15,timeOutCB:e.loadingOverTimeCB||function(){}}},this.params={echetotal:0,echelon:[],echelonlen:[],echeloncb:[],id:0,flag:0,allowType:["jpg","jpeg","png","gif"],total:0,completedCount:0,imgNode:[],imgNodePSrc:[]};for(var t in e)this.opts[t]=e[t];this._init()};n.prototype={_init:function(){var e=this,t=(e.opts,e.params);e._initData(),e.loadEcho(t.echelon[0])},_initData:function(){var e=this,t=e.opts,o=e.params;if(null!==t.sources){for(var n in t.sources){for(var r=[],a=0,i=t.sources[n].source.length;i>a;a++)r.push(t.sources[n].source[a]);o.total+=1*i,o.echelonlen.push(t.sources[n].source.length),o.echelon.push(r),o.echeloncb.push("undefined"==typeof t.sources[n].callback?null:t.sources[n].callback)}for(var n=1,i=o.echelonlen.length;i>n;n++)o.echelonlen[n]=o.echelonlen[n-1]+o.echelonlen[n];o.imgNode=document.getElementsByTagName("img");for(var n=0,i=o.imgNode.length;i>n;n++)o.imgNode[n].attributes.pSrc&&(o.imgNodePSrc[n]=o.imgNode[n].attributes.pSrc.value)}},loadEcho:function(e){for(var t=this,o=(t.opts,t.params,0),n=e.length;n>o;o++)t.load(e[o])},load:function(e){var t=this,o=t.opts,n=t.params;if(t.isImg(e)){var r=new Image,a=setTimeout(function(){o.config.timeOutCB()},1e3*o.config.timeOut);r.src=e,r.onload=function(){clearTimeout(a),o.progress(++n.completedCount,n.total);for(var r=0,i=n.imgNodePSrc.length;i>r;r++)if(n.imgNodePSrc[r]==e){n.imgNode[r].src=n.imgNodePSrc[r];break}t.next()},r.onerror=function(){o.progress(++n.completedCount,n.total),t.next()}}else t.throwIf("使用未允许类型图片或非图片类型"),o.progress(++n.completedCount,n.total)},next:function(){var e=this,t=e.opts,o=e.params;if(o.completedCount>=o.echelonlen[o.flag]){if(null!=o.echeloncb[o.flag]&&o.echeloncb[o.flag](),++o.flag,!o.echelon[o.flag])return void t.completeLoad();e.loadEcho(o.echelon[o.flag])}},isImg:function(e){for(var t=this,o=(t.opts,t.params),n=e.split(".").pop(),r=0,a=o.allowType.length;a>r;r++)if(n==o.allowType[r])return!0;return!1},throwIf:function(e){var t=this.opts,e=e||"未知错误";return t.isDebug?void alert(e):void 0}},e.exports=n}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// var connectorLoad = require("./connectorLoad.js"),
+	// 	imageLoad = require("./connectorLoad.js"),
+	// 	Preload.connectorLoad = connectorLoad,
+	// 	Preload.imageLoad = imageLoad;
+	var connectorLoad = __webpack_require__(1),
+		imageLoad = __webpack_require__(2),
+		cssLoad = __webpack_require__(3),
+		fontLoad = __webpack_require__(4),
+		Preload = {};
+
+	Preload.connectorLoad = connectorLoad;
+	Preload.imageLoad = imageLoad;
+	Preload.cssLoad = cssLoad;
+	Preload.fontLoad = fontLoad;
+
+
+	window.Preload = Preload;
+
+
+
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var connectorLoad = function(opts) {
+
+		"use strict";
+
+		//可修改参数
+		this.opts = {
+	    	isDebug: false,
+	        connector:  null, 										//接口数据		
+			completeLoad: function(){},								//加载完成回调
+
+		}
+
+		//业务逻辑所需参数
+		this.params = {
+			_createXHR: null,										//Ajax初始化
+
+			id: 0,													//自增ID
+			count: 0,												//队列总数
+
+	        head: document.getElementsByTagName("head")[0],			//异步调用接口数据
+		}
+
+		for (var i in opts) {
+			this.opts[i] = opts[i];
+		}
+
+		// console.log(opts);
+
+		this._init();
+	}
+
+	connectorLoad.prototype = {
+		_init: function(){
+			var self = this,
+				opts = self.opts,
+				params = self.params;
+
+			if (opts.connector == null) return;
+
+			//Ajax初始化
+			params._createXHR = self.getXHR();
+
+			params.count = Object.getOwnPropertyNames(opts.connector).length;
+
+			//调用接口数据
+	        self._getData();
+
+			//开始预加载资源
+			// self._load(params.echelon[0], params.echeloncb[0], params.echelonlen);			
+		},
+
+
+		/*
+		*	获取后台数据，区分同/异布
+		*
+		*/
+	    _getData: function() {
+
+			var self = this,
+				opts = self.opts,
+				params = self.params;
+
+	        for (var i in opts.connector) {
+	        	if(!opts.connector[i].url) self.throwIf(i + "队列URL不存在");
+
+	            if (opts.connector[i].jsonp || false) {
+	                self.asynGetData(opts.connector[i]);
+	            } else {
+	                self.syncGetData(opts.connector[i]);
+	            }
+	        }
+	    },
+
+	    /*
+		*	同步获取后台数据
+		*	
+		*	@param	url			接口路径 
+		*	@param	callback	成功后回调 
+		*
+		*/
+	    syncGetData: function(connect) {
+			var self = this,
+				params = this.params,
+				url = connect.url || "",
+				type = connect.type.toLocaleUpperCase(),
+				data = connect.data || {};
+
+
+
+			var timeOut = self.getTimeOut(connect.loadingOverTime, connect.loadingOverTimeCB);
+
+			if(type !== 'GET' && type !== 'POST') type = 'GET';
+
+	        params._createXHR.onreadystatechange = function() {
+	            if (params._createXHR.readyState == 4) {
+	            	clearTimeout(timeOut);
+	                if ((params._createXHR.status >= 200 && params._createXHR.status < 300) || params._createXHR.status === 304) {
+	                    connect.success(params._createXHR.responseText)
+	                }else{
+	                	self.throwIf("对" + url + "请求失败，状态码为：" + params._createXHR.status);
+	                	connect.error(params._createXHR);
+	                }
+
+	            	self.isCompleteAllLoad();
+	            }
+	        }
+
+	        // console.log("type", type);
+
+	        url = type == 'POST' ? url : url + '?' + self.getQueryString(data)
+
+	        // console.log(url);
+
+	        params._createXHR.open(type, url, connect.async || true);
+
+	        params._createXHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+	        // console.log(self.getQueryString(connect.data));
+
+	        params._createXHR.send(type == 'POST' ? self.getQueryString(data) : null);
+	    },
+
+		/*
+		*	跨域获取后台数据
+		*	
+		*	@param	url	接口路径 
+		*
+		*/
+	    asynGetData: function(connect) {
+			var self = this,
+				params = this.params,
+				url = connect.url || "",
+				loadingOverTime = connect.loadingOverTime || 12,
+				loadingOverTimeCB = connect.loadingOverTimeCB || function(){};
+
+			var timeOut = self.getTimeOut(loadingOverTime, loadingOverTimeCB);
+
+			url += (/\?/.test(url) ? "&" : "?") + '_=' +  Date.parse(new Date());
+			// console.log(url + (/\?/.test(url) ? "&" : "?") + '_=' +  Date.parse(new Date()));
+
+	        var script = document.createElement("script");
+	        script.src = url;
+	        params.head.appendChild(script);
+	        
+	        script.onload = function(){
+	        	// alert(1);
+	        	clearTimeout(timeOut);
+	        	params.head.removeChild(script);
+	            self.isCompleteAllLoad();
+	        }
+
+	    },
+
+	    /*
+		*	根据平台获取XHR
+		*	
+		*/
+		getXHR: function(){
+			if (typeof XMLHttpRequest != "undefined") return new XMLHttpRequest();
+			
+			throwIf("only Support IE9+")
+		},
+
+		getTimeOut: function(time, callback) {
+			return setTimeout(function(){
+				callback();
+			}, time * 1000);
+		},
+
+		//错误数据弹出
+		throwIf: function(msg) {
+			var opts = this.opts,
+				msg = msg || "未知错误";
+			if(opts.isDebug){
+				alert(msg);
+				return;
+			}
+		},
+
+		getQueryString: function(object) {
+	      return Object.keys( object ).map( function( item ) {
+	        return encodeURIComponent( item )
+	          + '=' + encodeURIComponent( object[ item ] );
+	      }).join( '&' );
+	    },
+
+	    isCompleteAllLoad: function() {
+	    	var self = this,
+				opts = self.opts,
+				params = self.params;
+
+	    	if(++params.id >= params.count){
+	    		opts.completeLoad();
+	    	}
+	    }
+	}
+
+	if (true) {
+	    module.exports = connectorLoad;
+	} else {
+	    window.connectorLoad = connectorLoad;
+	}
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var imageLoad = function(opts) {
+
+
+	    //可修改参数
+	    this.opts = {
+	        isDebug: false,
+	        sources: null, //预加载资源总队列
+	        progress: function() {}, //进度条回调
+	        completeLoad: function() {}, //加载完成回调
+	        config: {
+	            timeOut: opts.loadingOverTime || 15, //超时时间
+	            timeOutCB: opts.loadingOverTimeCB || function() {}, //超时回调
+	        },
+	    }
+
+	    //业务逻辑所需参数
+	    this.params = {
+	        echetotal: 0, //队列总数
+	        echelon: [], //队列资源列表
+	        echelonlen: [], //记录每个队列长度
+	        echeloncb: [], //队列回调标示
+
+	        id: 0, //自增ID
+	        flag: 0, //标示梯队
+
+	        allowType: ['jpg', 'jpeg', 'png', 'gif'], //允许加载的图片类型
+	        total: 0, //资源总数
+	        completedCount: 0, //已加载资源总数
+
+	        //img标签预加载
+	        imgNode: [],
+	        imgNodePSrc: [],
+	    }
+
+	    for (var i in opts) {
+	        this.opts[i] = opts[i];
+	    }
+
+	    // console.log(opts);
+
+	    this._init();
+
+	}
+
+	imageLoad.prototype = {
+	    _init: function() {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params;
+
+	        //初始化资源参数
+	        self._initData();
+
+	        // console.log(params.echelon);
+	        // console.log(params.echeloncb);
+	        // console.log(params.echelonlen);
+	        // console.log(params.total);
+
+	        //开始加载队列资源
+	        self.loadEcho(params.echelon[0])
+	    },
+
+	    _initData: function() {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params;
+
+
+	        if (opts.sources === null) return;
+
+	        //处理梯队资源和回调
+	        for (var i in opts.sources) {
+	            var echoLon = [];
+	            for (var j = 0, len = opts.sources[i].source.length; j < len; j++) {
+
+	                echoLon.push(opts.sources[i].source[j]);
+	                // console.log(opts.sources[i].source[j]);
+	            }
+	            // console.log(1);
+
+	            //资源总数
+	            params.total += len * 1;
+	            params.echelonlen.push(opts.sources[i].source.length);
+	            params.echelon.push(echoLon);
+
+	            params.echeloncb.push(typeof opts.sources[i].callback == 'undefined' ? null : opts.sources[i].callback);
+	        }
+
+	        //梯队回调标示位置
+	        for (var i = 1, len = params.echelonlen.length; i < len; i++) {
+	            params.echelonlen[i] = params.echelonlen[i - 1] + params.echelonlen[i];
+	        }
+
+	        //处理img标签的预加载
+	        params.imgNode = document.getElementsByTagName('img');          //获取img标签节点
+	        for(var i = 0, len = params.imgNode.length; i < len; i++){
+	            if(params.imgNode[i].attributes.pSrc){
+	                params.imgNodePSrc[i] = params.imgNode[i].attributes.pSrc.value;
+	            }
+	        }
+
+	        // params.total = params.echelon.length;
+
+
+	    },
+
+	    loadEcho: function(echo) {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params;
+
+	        for (var i = 0, len = echo.length; i < len; i++) {
+	            self.load(echo[i]);
+	        }
+
+
+	    },
+
+	    load: function(res) {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params;
+
+
+
+	        /*
+	         *  判断是否是图片类型
+	         *      YES，使用new Image加载
+	         *      NO，使用Ajax加载
+	         */
+	        if (self.isImg(res)) {
+	            // console.log(1);
+	            var img = new Image();
+	            // createTimer(new Date());
+
+	            var timer = setTimeout(function() {
+	                opts.config.timeOutCB();
+	            }, opts.config.timeOut * 1000);
+
+	            img.src = res;
+
+	            //加载成功后执行
+	            img.onload = function() {
+	                //加载成功后清理计时器
+	                clearTimeout(timer);
+	                opts.progress(++params.completedCount, params.total);
+	                        
+	                // console.log("imgNodePSrc", params.imgNodePSrc);
+
+	                //预加载标签替换
+	                for (var i = 0, len = params.imgNodePSrc.length; i < len; i++) {
+
+	                    if (params.imgNodePSrc[i] == res) {
+	                        params.imgNode[i].src = params.imgNodePSrc[i];
+	                        break;
+	                    }
+	                }
+
+
+	                self.next();
+
+	            }
+
+	            //加载失败后执行
+	            img.onerror = function() {
+	                opts.progress(++params.completedCount, params.total);
+	                self.next();
+	            }
+	        } else {
+	            self.throwIf('使用未允许类型图片或非图片类型');
+	            opts.progress(++params.completedCount, params.total);
+	        }
+	    },
+
+	    //是否加载下一队列
+	    next: function() {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params;
+	        if (params.completedCount >= params.echelonlen[params.flag]) {
+	            // console.log(1111);
+	            if (params.echeloncb[params.flag] != null) {
+	                params.echeloncb[params.flag]();
+	            }
+	            ++params.flag;
+	            if (params.echelon[params.flag]) {
+	                self.loadEcho(params.echelon[params.flag]);
+	            } else {
+	                opts.completeLoad();
+	                return;
+	            }
+	        }
+	    },
+
+
+	    /*
+	     *   判断传入是否是图片，根据后缀名和allowType校验是否符合要求
+	     *
+	     *   @param  res 图片资源路径
+	     *
+	     */
+	    isImg: function(res) {
+	        var self = this,
+	            opts = self.opts,
+	            params = self.params,
+	            type = res.split('.').pop();
+
+	        for (var i = 0, len = params.allowType.length; i < len; i++) {
+	            if (type == params.allowType[i]) return true;
+	        }
+	        return false;
+	    },
+
+	    //错误数据弹出
+	    throwIf: function(msg) {
+	        var opts = this.opts,
+	            msg = msg || "未知错误";
+	        if (opts.isDebug) {
+	            alert(msg);
+	            return;
+	        }
+	    }
+	}
+
+
+	if (true) {
+	    module.exports = imageLoad;
+	} else {
+	    window.imageLoad = imageLoad;
+	}
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var cssLoad = function(url, local, media) {
+	    function ready(e) {
+	        return doc.body ? e() : setTimeout(function() {
+	            ready(e)
+	        })
+	    }
+
+	    var onloadcssdefined = function(e) {
+	        for (var n = link.href, local = sheets.length; local--;)
+	            if (sheets[local].href === n) return e()
+	        setTimeout(function() {
+	            onloadcssdefined(e)
+	        })
+	    };
+
+	    var doc = window.document,
+	        sheets = doc.styleSheets,
+	        link = doc.createElement( "link" ),
+	        media = media || "all";
+	    link.rel = "stylesheet";
+	    link.href = url;
+	    link.media = media;
+
+	    // console.log(navigator.userAgent.toLowerCase().match(/firefox/));
+
+	    if(!local){
+	        var loa = ( doc.getElementsByTagName( "head" )[ 0 ] || doc.body ).childNodes;
+	        local = loa[loa.length - 1];
+	    }
+
+	    ready(function() {
+	        local.parentNode.insertBefore(link, local ? local : local.nextSibling)
+	    })
+
+	    link.addEventListener && link.addEventListener("load", function(e) {
+	        if(navigator.userAgent.toLowerCase().match(/firefox/)){
+	            var script = doc.createElement("script");
+	            local.parentNode.insertBefore(script, local ? local : local.nextSibling);
+	        }
+	    });
+
+	    link.onloadcssdefined = onloadcssdefined;
+
+	    onloadcssdefined(function() {
+	        link.media !== media && (link.media = media)
+	    })
+	}
+
+	 true ? module.exports = cssLoad : window.cssLoad = cssLoad;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var fontLoad = function(url, as, type, callback) {
+		var link = document.createElement( "link" );
+		    link.rel = "preload";
+		    link.href = url;
+		    link.as = as || "font";
+		    link.type = type || "font/ttf";
+		    link.setAttribute('crossorigin', 'anonymous'),
+		    callback = callback || function(){};
+
+		if(!link.relList || !link.relList.supports || !link.relList.supports('preload')){
+		  	alert("unsupports: Resource Hints preload");
+		  	return 0;
+		}
+
+		link.addEventListener('load', function(){
+		  	callback()
+
+		});
+		document.getElementsByTagName('head')[0].appendChild(link);
+	}
+
+	 true ? module.exports = fontLoad : window.fontLoad = fontLoad;
+
+
+/***/ }
+/******/ ]);
