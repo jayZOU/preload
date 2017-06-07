@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+</head>
+<body>
+<img p-src="https://1x.com/images/user/80f18a24e132cd58adaf3c0cb84e531b-ld.jpg" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy-facebook_s.jpg">
+<img p-src="https://1x.com/images/user/b525980b1c51af353a9ccbbd74a077af-ld.jpg" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy-facebook_s.jpg">
+<img p-src="https://1x.com/images/user/29998abafe442dece3160c1e2bb4fe9b-ld.jpg" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy-facebook_s.jpg">
+<!-- <script src='https://cdn.polyfill.io/v2/polyfill.min.js'></script> -->
+<!-- <script src="./dist/iife/imageLoad.js"></script> -->
+<script>
+
+
+	var p = new imageLoad({
+
+		progress: function(i, count){
+			console.log(Math.floor((i / count) * 100));
+		},
+		timeOut: 15,
+		timeOutCB: function(res){
+			console.log('timeout=',res);
+		}
+	})
+
+	p.load([
+		'https://1x.com/images/user/e55617f85d34f74fef78b001d37f94a4-ld.jpg',
+		'https://1x.com/images/user/3c0be5ca9ef676dcd10ad389a9ee4f28-ld.jpg',
+		'https://1x.com/images/user/39461acee8bb855036d4f1d0ead3e95d-ld.jpg',
+		'https://1x.com/images/user/61da7ac2fabdb44e3d573184dadcf743-ld.jpg'
+	])
+	.then(function(res){
+		console.log('first queue=', res);
+		return p.load([
+			'https://1x.com/images/user/2c71be126589c9cfb84158fbeca15503-ld.jpg',
+			'https://1x.com/images/user/d63b00f3c34abd54dc462369de21b5a1-ld.jpg',
+			'https://1x.com/images/user/2691657af3fcdc03f4ae0a3fbf44bc3c-ld.jpg'
+		])
+	})
+	.then(function(res){
+		console.log('second queue=', res);
+
+	})
+	.catch(function(err){
+		console.log(err);
+	})
+
+</script>
+</body>
+</html>
