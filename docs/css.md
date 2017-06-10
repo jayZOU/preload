@@ -12,7 +12,7 @@ var cssLoad= require('cssLoad');
 ```
 或者直接引入到HTML里面也可以
 ```html
-<script src="./dist/cssLoad.js"></script>
+<script src="https://unpkg.com/apreload@2.2.4/dist/iife/cssLoad.js"></script>
 ```
 
 ## usage

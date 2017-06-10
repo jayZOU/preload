@@ -26,7 +26,7 @@ var Preload = require('apreload');
 ```
 或者直接引入到HTML里面也可以
 ```html
-<script src="./dist/preload.global.js"></script>
+<script src="https://unpkg.com/apreload@2.2.4/dist/iife/preload.js"></script>
 ```
 
 ## dev  

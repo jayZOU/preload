@@ -20,7 +20,7 @@ var ImageLoad= require('imageLoad');
 ```html
 //不支持promise的浏览器，需要引入polyfill
 <!-- <script src='https://cdn.polyfill.io/v2/polyfill.min.js'></script> -->
-<script src="./dist/imageLoad.global.js"></script>
+<script src="https://unpkg.com/apreload@2.2.4/dist/iife/imageLoad.js"></script>
 ```
 
 ## usage
