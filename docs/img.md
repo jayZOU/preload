@@ -48,10 +48,10 @@ p.load([
 	})
 ```
 ## API
-### progress(进度)
-#### type
+### progress(进度)  
+#### type  
 function
-####demo
+#### demo  
 ```javascript
 var p = new imageLoad({
 	progress: function(i, count){
@@ -76,10 +76,10 @@ var p = new imageLoad({
 设置了超时时间，也需要设置超时回调，虽然不设置也不会报错，但是超时时间就无意义
 
 
-### timeOutCB(超时回调)
-####type
-function
-####demo
+### timeOutCB(超时回调)  
+#### type  
+function  
+#### demo  
 ```javascript
 var p = new imageLoad({
 	timeOutCB: function(res){
@@ -98,5 +98,5 @@ var p = new imageLoad({
 2. 超时时间是指一张图片加载的最大时间，而不是一个队列，即使触发超时回调，图片请求已经出去了，还是会继续加载，除非资源地址无效
 
 ## change log
-[2.1.2](https://github.com/jayZOU/preload/tree/2.1.2)
+[2.1.2](https://github.com/jayZOU/preload/tree/2.1.2)  
 [2.0.1](https://github.com/jayZOU/preload/tree/2.0.1)

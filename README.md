@@ -2,15 +2,15 @@
 静态资源预加载组件  
 一共分为3个模块（img/css/font），可单独使用，支持amd、cjs、es、iife、umd多种形式使用
 
-[图片预加载](https://github.com/jayZOU/preload/blob/master/docs/img.md)
-[CSS加载](https://github.com/jayZOU/preload/blob/master/docs/css.md)
-[font加载](https://github.com/jayZOU/preload/blob/master/docs/font.md)
+[图片预加载](https://github.com/jayZOU/preload/blob/master/docs/img.md)  
+[CSS加载](https://github.com/jayZOU/preload/blob/master/docs/css.md)  
+[font加载](https://github.com/jayZOU/preload/blob/master/docs/font.md)  
 
-##install
+## install
 ```
 npm install apreload
 ```
-##usage
+## usage
 可以用ES6 模块的形式引入
 ```javascript
 import Preload from 'apreload' 
@@ -23,3 +23,7 @@ var Preload = require('apreload');
 ```html
 <script src="./dist/preload.global.js"></script>
 ```
+
+## change log
+[2.1.2](https://github.com/jayZOU/preload/tree/2.1.2)  
+[2.0.1](https://github.com/jayZOU/preload/tree/2.0.1)
