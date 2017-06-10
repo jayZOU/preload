@@ -68,4 +68,4 @@ gulp.task('dev', function () {
 	gulp.watch('./src/*.js', ['es', 'cjs', 'global', 'umd'])
 
 })
-gulp.task('default', ['es-uglify', 'cjs-uglify', 'global-uglify', 'umd-uglify']);
+// gulp.task('default', ['es-uglify', 'cjs-uglify', 'global-uglify', 'umd-uglify']);
