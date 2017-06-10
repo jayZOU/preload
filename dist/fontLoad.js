@@ -1,1 +1,22 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var fontLoad=function(e,t,o,r){var n=document.createElement("link");if(n.rel="preload",n.href=e,n.as=t||"font",n.type=o||"font/ttf",n.setAttribute("crossorigin","anonymous"),r=r||function(){},!n.relList||!n.relList.supports||!n.relList.supports("preload"))return alert("unsupports: Resource Hints preload"),0;n.addEventListener("load",function(){r()}),document.getElementsByTagName("head")[0].appendChild(n)};exports.default=fontLoad;
+var fontLoad = function(url, as, type, callback) {
+	var link = document.createElement( "link" );
+	    link.rel = "preload";
+	    link.href = url;
+	    link.as = as || "font";
+	    link.type = type || "font/ttf";
+	    link.setAttribute('crossorigin', 'anonymous'),
+	    callback = callback || function(){};
+
+	if(!link.relList || !link.relList.supports || !link.relList.supports('preload')){
+	  	alert("unsupports: Resource Hints preload");
+	  	return 0;
+	}
+
+	link.addEventListener('load', function(){
+	  	callback();
+
+	});
+	document.getElementsByTagName('head')[0].appendChild(link);
+};
+
+export default fontLoad;

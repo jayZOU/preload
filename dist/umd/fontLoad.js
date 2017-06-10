@@ -1,1 +1,30 @@
-"use strict";var _typeof2="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(o){return typeof o}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":typeof o},_typeof="function"==typeof Symbol&&"symbol"==_typeof2(Symbol.iterator)?function(o){return void 0===o?"undefined":_typeof2(o)}:function(o){return o&&"function"==typeof Symbol&&o.constructor===Symbol&&o!==Symbol.prototype?"symbol":void 0===o?"undefined":_typeof2(o)};!function(o,t){"object"===("undefined"==typeof exports?"undefined":_typeof(exports))&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(void 0).fontLoad=t()}(0,function(){return function(o,t,e,n){var r=document.createElement("link");if(r.rel="preload",r.href=o,r.as=t||"font",r.type=e||"font/ttf",r.setAttribute("crossorigin","anonymous"),n=n||function(){},!r.relList||!r.relList.supports||!r.relList.supports("preload"))return alert("unsupports: Resource Hints preload"),0;r.addEventListener("load",function(){n()}),document.getElementsByTagName("head")[0].appendChild(r)}});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.fontLoad = factory());
+}(this, (function () { 'use strict';
+
+var fontLoad = function(url, as, type, callback) {
+	var link = document.createElement( "link" );
+	    link.rel = "preload";
+	    link.href = url;
+	    link.as = as || "font";
+	    link.type = type || "font/ttf";
+	    link.setAttribute('crossorigin', 'anonymous'),
+	    callback = callback || function(){};
+
+	if(!link.relList || !link.relList.supports || !link.relList.supports('preload')){
+	  	alert("unsupports: Resource Hints preload");
+	  	return 0;
+	}
+
+	link.addEventListener('load', function(){
+	  	callback();
+
+	});
+	document.getElementsByTagName('head')[0].appendChild(link);
+};
+
+return fontLoad;
+
+})));

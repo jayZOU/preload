@@ -1,1 +1,148 @@
-"use strict";function _classCallCheck(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}var _typeof2="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},_createClass=function(){function t(t,e){for(var o=0;o<e.length;o++){var n=e[o];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(t,n.key,n)}}return function(e,o,n){return o&&t(e.prototype,o),n&&t(e,n),e}}(),_typeof="function"==typeof Symbol&&"symbol"==_typeof2(Symbol.iterator)?function(t){return void 0===t?"undefined":_typeof2(t)}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":void 0===t?"undefined":_typeof2(t)};!function(t,e){"object"===("undefined"==typeof exports?"undefined":_typeof(exports))&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define(e):(void 0).imageLoad=e()}(0,function(){return function(){function t(e){_classCallCheck(this,t),e=e||{},this.callBack={},this.progress=e.progress?e.progress.bind(this):function(){},this.timeOut=e.timeOut||15,this.timeOutCB=e.timeOutCB?e.timeOutCB.bind(this):function(){},this.reset(),this.imgNode=[],this.loadTag()}return _createClass(t,[{key:"load",value:function(t){var e=this,o=this;return new Promise(function(n,r){e.isArrayFn(t)||r(new Error("It's not allow params")),t.length||r(new Error("It's not null")),o.reset(t.length),o.imgList=t,t.forEach(function(t){var r=new Image,i=o._timeOut(t);r.src=t,r.onload=o.onload.bind(e,t,i,n),r.onerror=o.onerror.bind(e,t,i,n)})})}},{key:"loadTag",value:function(){for(var t=this,e=document.getElementsByTagName("img"),o=0,n=e.length;o<n;o++)!function(o,n){if(e[o].attributes["p-src"]){var r=new Image,i=e[o].attributes["p-src"].value,s=t._timeOut(i);r.src=i,r.onload=function(){clearTimeout(s),e[o].src=i}}}(o)}},{key:"_timeOut",value:function(t){var e=this,o=setTimeout(function(){e.timeOutCB({name:t,msg:"load timer"}),clearTimeout(o)},1e3*e.timeOut);return o}},{key:"onload",value:function(t,e,o){clearTimeout(e),this.success.data.push(t),this.progress(++this.flag,this.count),this.complate(o)}},{key:"onerror",value:function(t,e,o){clearTimeout(e),this.err.data.push(t),this.progress(++this.flag,this.count),this.complate(o)}},{key:"complate",value:function(t){this.flag>=this.count&&t(this.success)}},{key:"reset",value:function(t){this.imgList=[],this.flag=0,this.count=t,this.success={code:0,msg:"success",data:[]},this.err={code:-1,msg:"load error",data:[]}}},{key:"isArrayFn",value:function(t){return"function"==typeof Array.isArray?Array.isArray(t):"[object Array]"===Object.prototype.toString.call(t)}}]),t}()});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.imageLoad = factory());
+}(this, (function () { 'use strict';
+
+class ImageLoad{
+	constructor(opts){
+		opts = opts || {};
+		this.callBack = {};
+		this.progress = opts.progress ? opts.progress.bind(this) : function(){};
+		this.timeOut = opts.timeOut || 15;
+		this.timeOutCB = opts.timeOutCB ? opts.timeOutCB.bind(this) : function(){};
+
+
+		// 初始化队列加载参数
+		this.reset();	
+
+		//获取img标签预加载资源列表
+		this.imgNode = [];
+		this.loadTag();
+	}
+
+
+	load(imgList){
+		const that = this;
+
+		return new Promise((resolve, reject) => {
+			if(!this.isArrayFn(imgList)) reject(new Error("It's not allow params"));
+			if(!imgList.length) reject(new Error("It's not null"));
+			//重置队列
+			that.reset(imgList.length);
+
+			that.imgList = imgList;
+
+			imgList.forEach((item) => {
+				//开始加载
+				let img = new Image();
+				//超时回调
+				let timer = that._timeOut(item);
+				// console.log('that.timer=',that.timer);
+
+				img.src = item;
+
+				//加载成功
+				img.onload = that.onload.bind(this, item, timer, resolve);
+				//加载失败
+				img.onerror = that.onerror.bind(this, item, timer, resolve);
+
+			});
+
+		})
+	}
+
+	loadTag(){
+		const that = this;
+		let imgNode = document.getElementsByTagName('img');
+		for(let i = 0, len = imgNode.length; i < len; i++){
+            if(imgNode[i].attributes['p-src']){
+				//开始加载
+				let img = new Image();
+				let src = imgNode[i].attributes['p-src'].value;
+				//超时回调
+				let timer = that._timeOut(src);
+				
+				img.src = src;
+				img.onload = ()=>{
+					clearTimeout(timer);
+					imgNode[i].src = src;
+				};
+            }
+        }
+
+	}
+
+    _timeOut(src) {
+    	const that = this;
+
+        let timer = setTimeout(() => {
+            that.timeOutCB({
+                name: src,
+                msg: "load timer"
+            });
+            clearTimeout(timer);
+        }, that.timeOut * 1000);
+        return timer;
+    	console.log('timer=', timer);
+    }
+
+
+    onload(src, timer, resolve) {
+        //清理计时器
+        clearTimeout(timer);
+        //加载成功信息记录
+        this.success.data.push(src);
+        //执行进度回调
+        this.progress(++this.flag, this.count);
+        //队列加载完成后调起then
+        this.complate(resolve);
+    }
+
+    onerror(src, timer, resolve) {
+        //清理计时器
+        clearTimeout(timer);
+        //错误信息记录
+        this.err.data.push(src);
+        //执行进度回调
+        this.progress(++this.flag, this.count);
+
+        //队列加载完成后调起then
+        this.complate(resolve);
+    }	
+
+    complate(resolve){
+        if(this.flag >= this.count){
+        	resolve(this.success);
+        }
+
+    }
+
+	reset(len){
+		this.imgList = [];
+		this.flag = 0;
+		this.count = len;
+		this.success = {						
+			code: 0,
+			msg: 'success',
+			data: []
+		};	
+		this.err = {					
+			code: -1,
+			msg: 'load error',
+			data: []
+
+		};
+	}
+
+	isArrayFn(arr){
+		if(typeof Array.isArray == "function") return Array.isArray(arr);
+
+		return Object.prototype.toString.call(arr) === '[object Array]';
+	}
+
+}
+
+return ImageLoad;
+
+})));

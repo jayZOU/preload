@@ -1,1 +1,24 @@
-"use strict";var fontLoad=function(t,e,o,n){var r=document.createElement("link");if(r.rel="preload",r.href=t,r.as=e||"font",r.type=o||"font/ttf",r.setAttribute("crossorigin","anonymous"),n=n||function(){},!r.relList||!r.relList.supports||!r.relList.supports("preload"))return alert("unsupports: Resource Hints preload"),0;r.addEventListener("load",function(){n()}),document.getElementsByTagName("head")[0].appendChild(r)};module.exports=fontLoad;
+'use strict';
+
+var fontLoad = function(url, as, type, callback) {
+	var link = document.createElement( "link" );
+	    link.rel = "preload";
+	    link.href = url;
+	    link.as = as || "font";
+	    link.type = type || "font/ttf";
+	    link.setAttribute('crossorigin', 'anonymous'),
+	    callback = callback || function(){};
+
+	if(!link.relList || !link.relList.supports || !link.relList.supports('preload')){
+	  	alert("unsupports: Resource Hints preload");
+	  	return 0;
+	}
+
+	link.addEventListener('load', function(){
+	  	callback();
+
+	});
+	document.getElementsByTagName('head')[0].appendChild(link);
+};
+
+module.exports = fontLoad;

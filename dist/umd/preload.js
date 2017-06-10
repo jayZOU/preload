@@ -1,1 +1,224 @@
-"use strict";function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var _typeof2="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},_createClass=function(){function e(e,t){for(var n=0;n<t.length;n++){var o=t[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}return function(t,n,o){return n&&e(t.prototype,n),o&&e(t,o),t}}(),_typeof="function"==typeof Symbol&&"symbol"==_typeof2(Symbol.iterator)?function(e){return void 0===e?"undefined":_typeof2(e)}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":void 0===e?"undefined":_typeof2(e)};!function(e,t){"object"===("undefined"==typeof exports?"undefined":_typeof(exports))&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t(e.preload=e.preload||{})}(void 0,function(e){var t=function(){function e(t){_classCallCheck(this,e),t=t||{},this.callBack={},this.progress=t.progress?t.progress.bind(this):function(){},this.timeOut=t.timeOut||15,this.timeOutCB=t.timeOutCB?t.timeOutCB.bind(this):function(){},this.reset(),this.imgNode=[],this.loadTag()}return _createClass(e,[{key:"load",value:function(e){var t=this,n=this;return new Promise(function(o,r){t.isArrayFn(e)||r(new Error("It's not allow params")),e.length||r(new Error("It's not null")),n.reset(e.length),n.imgList=e,e.forEach(function(e){var r=new Image,i=n._timeOut(e);r.src=e,r.onload=n.onload.bind(t,e,i,o),r.onerror=n.onerror.bind(t,e,i,o)})})}},{key:"loadTag",value:function(){for(var e=this,t=document.getElementsByTagName("img"),n=0,o=t.length;n<o;n++)!function(n,o){if(t[n].attributes["p-src"]){var r=new Image,i=t[n].attributes["p-src"].value,s=e._timeOut(i);r.src=i,r.onload=function(){clearTimeout(s),t[n].src=i}}}(n)}},{key:"_timeOut",value:function(e){var t=this,n=setTimeout(function(){t.timeOutCB({name:e,msg:"load timer"}),clearTimeout(n)},1e3*t.timeOut);return n}},{key:"onload",value:function(e,t,n){clearTimeout(t),this.success.data.push(e),this.progress(++this.flag,this.count),this.complate(n)}},{key:"onerror",value:function(e,t,n){clearTimeout(t),this.err.data.push(e),this.progress(++this.flag,this.count),this.complate(n)}},{key:"complate",value:function(e){this.flag>=this.count&&e(this.success)}},{key:"reset",value:function(e){this.imgList=[],this.flag=0,this.count=e,this.success={code:0,msg:"success",data:[]},this.err={code:-1,msg:"load error",data:[]}}},{key:"isArrayFn",value:function(e){return"function"==typeof Array.isArray?Array.isArray(e):"[object Array]"===Object.prototype.toString.call(e)}}]),e}(),n=function(e,t,n){function o(e){return i.body?e():setTimeout(function(){o(e)})}var r=function e(t){for(var n=a.href,o=s.length;o--;)if(s[o].href===n)return t();setTimeout(function(){e(t)})},i=window.document,s=i.styleSheets,a=i.createElement("link"),n=n||"all";if(a.rel="stylesheet",a.href=e,a.media=n,!t){var u=(i.getElementsByTagName("head")[0]||i.body).childNodes;t=u[u.length-1]}o(function(){t.parentNode.insertBefore(a,t||t.nextSibling)}),a.addEventListener&&a.addEventListener("load",function(e){if(navigator.userAgent.toLowerCase().match(/firefox/)){var n=i.createElement("script");t.parentNode.insertBefore(n,t||t.nextSibling)}}),a.onloadcssdefined=r,r(function(){a.media!==n&&(a.media=n)})},o=function(e,t,n,o){var r=document.createElement("link");if(r.rel="preload",r.href=e,r.as=t||"font",r.type=n||"font/ttf",r.setAttribute("crossorigin","anonymous"),o=o||function(){},!r.relList||!r.relList.supports||!r.relList.supports("preload"))return alert("unsupports: Resource Hints preload"),0;r.addEventListener("load",function(){o()}),document.getElementsByTagName("head")[0].appendChild(r)};e.imageLoad=t,e.cssLoad=n,e.fontLoad=o,Object.defineProperty(e,"__esModule",{value:!0})});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.preload = factory());
+}(this, (function () { 'use strict';
+
+class ImageLoad{
+	constructor(opts){
+		opts = opts || {};
+		this.callBack = {};
+		this.progress = opts.progress ? opts.progress.bind(this) : function(){};
+		this.timeOut = opts.timeOut || 15;
+		this.timeOutCB = opts.timeOutCB ? opts.timeOutCB.bind(this) : function(){};
+
+
+		// 初始化队列加载参数
+		this.reset();	
+
+		//获取img标签预加载资源列表
+		this.imgNode = [];
+		this.loadTag();
+	}
+
+
+	load(imgList){
+		const that = this;
+
+		return new Promise((resolve, reject) => {
+			if(!this.isArrayFn(imgList)) reject(new Error("It's not allow params"));
+			if(!imgList.length) reject(new Error("It's not null"));
+			//重置队列
+			that.reset(imgList.length);
+
+			that.imgList = imgList;
+
+			imgList.forEach((item) => {
+				//开始加载
+				let img = new Image();
+				//超时回调
+				let timer = that._timeOut(item);
+				// console.log('that.timer=',that.timer);
+
+				img.src = item;
+
+				//加载成功
+				img.onload = that.onload.bind(this, item, timer, resolve);
+				//加载失败
+				img.onerror = that.onerror.bind(this, item, timer, resolve);
+
+			});
+
+		})
+	}
+
+	loadTag(){
+		const that = this;
+		let imgNode = document.getElementsByTagName('img');
+		for(let i = 0, len = imgNode.length; i < len; i++){
+            if(imgNode[i].attributes['p-src']){
+				//开始加载
+				let img = new Image();
+				let src = imgNode[i].attributes['p-src'].value;
+				//超时回调
+				let timer = that._timeOut(src);
+				
+				img.src = src;
+				img.onload = ()=>{
+					clearTimeout(timer);
+					imgNode[i].src = src;
+				};
+            }
+        }
+
+	}
+
+    _timeOut(src) {
+    	const that = this;
+
+        let timer = setTimeout(() => {
+            that.timeOutCB({
+                name: src,
+                msg: "load timer"
+            });
+            clearTimeout(timer);
+        }, that.timeOut * 1000);
+        return timer;
+    	console.log('timer=', timer);
+    }
+
+
+    onload(src, timer, resolve) {
+        //清理计时器
+        clearTimeout(timer);
+        //加载成功信息记录
+        this.success.data.push(src);
+        //执行进度回调
+        this.progress(++this.flag, this.count);
+        //队列加载完成后调起then
+        this.complate(resolve);
+    }
+
+    onerror(src, timer, resolve) {
+        //清理计时器
+        clearTimeout(timer);
+        //错误信息记录
+        this.err.data.push(src);
+        //执行进度回调
+        this.progress(++this.flag, this.count);
+
+        //队列加载完成后调起then
+        this.complate(resolve);
+    }	
+
+    complate(resolve){
+        if(this.flag >= this.count){
+        	resolve(this.success);
+        }
+
+    }
+
+	reset(len){
+		this.imgList = [];
+		this.flag = 0;
+		this.count = len;
+		this.success = {						
+			code: 0,
+			msg: 'success',
+			data: []
+		};	
+		this.err = {					
+			code: -1,
+			msg: 'load error',
+			data: []
+
+		};
+	}
+
+	isArrayFn(arr){
+		if(typeof Array.isArray == "function") return Array.isArray(arr);
+
+		return Object.prototype.toString.call(arr) === '[object Array]';
+	}
+
+}
+
+var cssLoad = function(url, local, media) {
+    function ready(e) {
+        return doc.body ? e() : setTimeout(function() {
+            ready(e);
+        })
+    }
+
+    var onloadcssdefined = function(e) {
+        for (var n = link.href, local = sheets.length; local--;)
+            if (sheets[local].href === n) return e()
+        setTimeout(function() {
+            onloadcssdefined(e);
+        });
+    };
+
+    var doc = window.document,
+        sheets = doc.styleSheets,
+        link = doc.createElement( "link" ),
+        media = media || "all";
+    link.rel = "stylesheet";
+    link.href = url;
+    link.media = media;
+
+    // console.log(navigator.userAgent.toLowerCase().match(/firefox/));
+
+    if(!local){
+        var loa = ( doc.getElementsByTagName( "head" )[ 0 ] || doc.body ).childNodes;
+        local = loa[loa.length - 1];
+    }
+
+    ready(function() {
+        local.parentNode.insertBefore(link, local ? local : local.nextSibling);
+    });
+
+    link.addEventListener && link.addEventListener("load", function(e) {
+        if(navigator.userAgent.toLowerCase().match(/firefox/)){
+            var script = doc.createElement("script");
+            local.parentNode.insertBefore(script, local ? local : local.nextSibling);
+        }
+    });
+
+    link.onloadcssdefined = onloadcssdefined;
+
+    onloadcssdefined(function() {
+        link.media !== media && (link.media = media);
+    });
+};
+
+// typeof module == 'object' ? module.exports = cssLoad : window.cssLoad = cssLoad;
+
+var fontLoad = function(url, as, type, callback) {
+	var link = document.createElement( "link" );
+	    link.rel = "preload";
+	    link.href = url;
+	    link.as = as || "font";
+	    link.type = type || "font/ttf";
+	    link.setAttribute('crossorigin', 'anonymous'),
+	    callback = callback || function(){};
+
+	if(!link.relList || !link.relList.supports || !link.relList.supports('preload')){
+	  	alert("unsupports: Resource Hints preload");
+	  	return 0;
+	}
+
+	link.addEventListener('load', function(){
+	  	callback();
+
+	});
+	document.getElementsByTagName('head')[0].appendChild(link);
+};
+
+let preload = {};
+preload.imageLoad = ImageLoad;
+preload.cssLoad = cssLoad;
+preload.fontLoad = fontLoad;
+
+return preload;
+
+})));

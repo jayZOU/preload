@@ -1,1 +1,51 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var cssLoad=function(e,t,n){function r(e){return o.body?e():setTimeout(function(){r(e)})}var i=function e(t){for(var n=s.href,r=a.length;r--;)if(a[r].href===n)return t();setTimeout(function(){e(t)})},o=window.document,a=o.styleSheets,s=o.createElement("link"),n=n||"all";if(s.rel="stylesheet",s.href=e,s.media=n,!t){var d=(o.getElementsByTagName("head")[0]||o.body).childNodes;t=d[d.length-1]}r(function(){t.parentNode.insertBefore(s,t||t.nextSibling)}),s.addEventListener&&s.addEventListener("load",function(e){if(navigator.userAgent.toLowerCase().match(/firefox/)){var n=o.createElement("script");t.parentNode.insertBefore(n,t||t.nextSibling)}}),s.onloadcssdefined=i,i(function(){s.media!==n&&(s.media=n)})};exports.default=cssLoad;
+var cssLoad = function(url, local, media) {
+    function ready(e) {
+        return doc.body ? e() : setTimeout(function() {
+            ready(e);
+        })
+    }
+
+    var onloadcssdefined = function(e) {
+        for (var n = link.href, local = sheets.length; local--;)
+            if (sheets[local].href === n) return e()
+        setTimeout(function() {
+            onloadcssdefined(e);
+        });
+    };
+
+    var doc = window.document,
+        sheets = doc.styleSheets,
+        link = doc.createElement( "link" ),
+        media = media || "all";
+    link.rel = "stylesheet";
+    link.href = url;
+    link.media = media;
+
+    // console.log(navigator.userAgent.toLowerCase().match(/firefox/));
+
+    if(!local){
+        var loa = ( doc.getElementsByTagName( "head" )[ 0 ] || doc.body ).childNodes;
+        local = loa[loa.length - 1];
+    }
+
+    ready(function() {
+        local.parentNode.insertBefore(link, local ? local : local.nextSibling);
+    });
+
+    link.addEventListener && link.addEventListener("load", function(e) {
+        if(navigator.userAgent.toLowerCase().match(/firefox/)){
+            var script = doc.createElement("script");
+            local.parentNode.insertBefore(script, local ? local : local.nextSibling);
+        }
+    });
+
+    link.onloadcssdefined = onloadcssdefined;
+
+    onloadcssdefined(function() {
+        link.media !== media && (link.media = media);
+    });
+};
+
+// typeof module == 'object' ? module.exports = cssLoad : window.cssLoad = cssLoad;
+
+export default cssLoad;

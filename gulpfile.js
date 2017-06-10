@@ -1,5 +1,6 @@
 var gulp       = require('gulp'),
     rollup     = require('gulp-rollup'),
+    pump       = require('pump'),
     babel      = require('gulp-babel'),
     uglify     = require('gulp-uglify');
 
@@ -38,6 +39,10 @@ gulp.task('global', function() {
 	      format: 'iife',
 	    })
     )
+
+    .pipe(babel({
+      presets: ['es2015']
+    }))
     .pipe(gulp.dest('./dist/iife/'));
 });
 
@@ -54,13 +59,23 @@ gulp.task('umd', function() {
     .pipe(gulp.dest('./dist/umd/'));
 });
 
-gulp.task('minifile', function() {
-  gulp.src(['./dist/**/*.js'])
-      .pipe(babel({
-          presets: ['es2015']
-        }))
-        .pipe(uglify())
-        .pipe(gulp.dest('./dist'));
+// gulp.task('minifile', function() {
+//   gulp.src(['./dist/**/*.js', '!./dist/*.js'])
+//       // .pipe(babel({
+//       //     presets: ['es2015']
+//       //   }))
+//         .pipe(uglify())
+//         .pipe(gulp.dest('./dist'));
+// });
+
+gulp.task('minifile', function (cb) {
+  pump([
+        gulp.src(['./dist/iife/*.js']),
+        uglify(),
+        gulp.dest('./dist/iife')
+    ],
+    cb
+  );
 });
 
 

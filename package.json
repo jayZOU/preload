@@ -1,6 +1,6 @@
 {
   "name": "apreload",
-  "version": "2.2.2",
+  "version": "2.2.4",
   "description": "a preload component",
   "main": "./dist/preload.js",
   "devDependencies": {
@@ -34,7 +34,7 @@
   },
   "scripts": {
     "dev": "gulp dev",
-    "build": "gulp build"
+    "build": "gulp minifile"
   },
   "repository": {
     "type": "git",
