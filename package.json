@@ -1,8 +1,8 @@
 {
-  "name": "preload",
+  "name": "apreload",
   "version": "2.2.2",
   "description": "a preload component",
-  "main": "preload.js",
+  "main": "./dist/preload.js",
   "devDependencies": {
     "babel-cli": "^6.23.0",
     "babel-core": "^6.0.0",
